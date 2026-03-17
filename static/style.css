@@ -1,0 +1,260 @@
+/* ========================= */
+/* RESET                     */
+/* ========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========================= */
+/* BASE                      */
+/* ========================= */
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #0f1115;
+    color: #e0e0e0;
+}
+
+/* ========================= */
+/* HEADER                    */
+/* ========================= */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #1a1c22;
+    padding: 15px 80px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    z-index: 1000;
+    border-bottom: 1px solid #222;
+}
+
+/* NAV */
+
+.link-nav a {
+    font-size: 1em;
+    color: #ccc;
+    text-decoration: none;
+    margin-left: 20px;
+    transition: 0.3s;
+}
+
+.link-nav a:hover {
+    color: white;
+}
+
+/* ========================= */
+/* BUTTONS                   */
+/* ========================= */
+
+.link-nav button {
+    width: 130px;
+    height: 45px;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* FIX border syntax */
+.btnlogin { border: 2px solid #00FF9F; color: #00FF9F; }
+.btnRegistre { border: 2px solid #00aaff; color: #00aaff; }
+.btnLogout { border: 2px solid #ff3b3b; color: #ff3b3b; }
+
+.btnlogin:hover {
+    background: #00FF9F;
+    color: black;
+    box-shadow: 0 0 15px rgba(0,255,159,0.6);
+}
+
+.btnRegistre:hover {
+    background: #00aaff;
+    color: black;
+    box-shadow: 0 0 15px rgba(0,170,255,0.6);
+}
+
+.btnLogout:hover {
+    background: #ff3b3b;
+    color: black;
+    box-shadow: 0 0 15px rgba(255,59,59,0.6);
+}
+
+/* ========================= */
+/* CONTAINER                 */
+/* ========================= */
+
+.container {
+    padding-top: 120px;
+    width: 80%;
+    margin: auto;
+}
+
+/* ========================= */
+/* CATEGORIES (HOME)         */
+/* ========================= */
+
+.categories {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.cat {
+    padding: 25px 40px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+/* neon hover */
+.cat:hover {
+    transform: translateY(-5px);
+}
+
+/* ========================= */
+/* CATEGORY COLORS           */
+/* ========================= */
+
+.red {
+    --main-color: #ff3b3b;
+    --glow: rgba(255, 59, 59, 0.6);
+}
+
+.blue {
+    --main-color: #00aaff;
+    --glow: rgba(0, 170, 255, 0.6);
+}
+
+.purple {
+    --main-color: #b84dff;
+    --glow: rgba(184, 77, 255, 0.6);
+}
+
+/* ========================= */
+/* TITLES                    */
+/* ========================= */
+
+h1, h2, h3 {
+    color: var(--main-color);
+    text-shadow: 0 0 10px var(--glow);
+    margin-bottom: 15px;
+}
+
+/* ========================= */
+/* TOPIC CARDS               */
+/* ========================= */
+
+.topic-card {
+    background: #1a1a1a;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+
+    border: 1px solid var(--main-color);
+
+    box-shadow:
+        0 0 10px var(--glow),
+        inset 0 0 5px var(--glow);
+
+    transition: 0.3s;
+}
+
+.topic-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 0 20px var(--glow),
+        inset 0 0 10px var(--glow);
+}
+
+.topic-card a {
+    color: var(--main-color);
+    text-decoration: none;
+}
+
+/* ========================= */
+/* POSTS                     */
+/* ========================= */
+
+.post-card {
+    background: #1a1a1a;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+
+    border-left: 4px solid var(--main-color);
+
+    box-shadow: 0 0 8px var(--glow);
+}
+
+.post-card p {
+    color: #ddd;
+}
+
+.post-card small {
+    color: #888;
+}
+
+/* ========================= */
+/* FORM                      */
+/* ========================= */
+
+textarea {
+    width: 100%;
+    height: 120px;
+    background: #0f1115;
+    color: white;
+
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+
+    padding: 10px;
+
+    box-shadow: 0 0 10px var(--glow);
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+
+    background: transparent;
+    color: var(--main-color);
+
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 10px var(--glow);
+    transition: 0.3s;
+}
+
+button:hover {
+    background: var(--main-color);
+    color: black;
+}
+
+/* ========================= */
+/* LINKS                     */
+/* ========================= */
+
+a {
+    color: var(--main-color);
+}
+
+a:hover {
+    text-shadow: 0 0 5px var(--glow);
+}
