@@ -106,3 +106,17 @@ def topic_view(category, topic_id):
 
     posts = Post.query.filter_by(topic_id=topic.id, topic_type=category).order_by(Post.created_at.asc()).all()
     return render_template("topic.html", topic=topic, posts=posts, category=category)
+
+# --- Category Page ---
+@main_bp.route("/category/<category>")
+def category_view(category):
+    if category == "red":
+        topics = RedTopic.query.order_by(RedTopic.created_at.desc()).all()
+    elif category == "blue":
+        topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).all()
+    elif category == "purple":
+        topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).all()
+    else:
+        return "Invalid category"
+
+    return render_template("category.html", topics=topics, category=category)

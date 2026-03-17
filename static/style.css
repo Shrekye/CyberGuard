@@ -101,3 +101,40 @@ header{
     height: 300px;
 }
 
+.categories {
+    display: flex;
+    gap: 20px;
+}
+
+.cat {
+    padding: 20px;
+    text-decoration: none;
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* couleurs catégories */
+.red { background-color: #e74c3c; }
+.blue { background-color: #3498db; }
+.purple { background-color: #9b59b6; }
+
+/* topics */
+.topics {
+    margin-top: 20px;
+}
+
+.topic-card {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.topics.red .topic-card { background-color: #f8d7da; }
+.topics.blue .topic-card { background-color: #d6eaf8; }
+.topics.purple .topic-card { background-color: #ebdef0; }
+
+.topic-card a {
+    text-decoration: none;
+    color: black;
+}

@@ -1,31 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Topics</h2>
-<h3>Red</h3>
-<ul>
-{% for topic in red_topics %}
-    <li><a href="{{ url_for('main.topic_view', category='red', topic_id=topic.id) }}">{{ topic.title }}</a></li>
-{% else %}
-    <li><em>No red topics yet.</em></li>
-{% endfor %}
-</ul>
 
-<h3>Blue</h3>
-<ul>
-{% for topic in blue_topics %}
-    <li><a href="{{ url_for('main.topic_view', category='blue', topic_id=topic.id) }}">{{ topic.title }}</a></li>
-{% else %}
-    <li><em>No blue topics yet.</em></li>
-{% endfor %}
-</ul>
+<h1>Choose a category</h1>
 
-<h3>Purple</h3>
-<ul>
-{% for topic in purple_topics %}
-    <li><a href="{{ url_for('main.topic_view', category='purple', topic_id=topic.id) }}">{{ topic.title }}</a></li>
-{% else %}
-    <li><em>No purple topics yet.</em></li>
-{% endfor %}
-</ul>
+<div class="categories">
+    <a href="{{ url_for('main.category_view', category='red') }}" class="cat red">Red</a>
+    <a href="{{ url_for('main.category_view', category='blue') }}" class="cat blue">Blue</a>
+    <a href="{{ url_for('main.category_view', category='purple') }}" class="cat purple">Purple</a>
+</div>
+
 {% endblock %}
