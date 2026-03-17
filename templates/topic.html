@@ -1,21 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ topic.title }}</h2>
-<p>Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+<div class="page {{ category }}">
+
+<h2 class="topic-title">{{ topic.title }}</h2>
+<p class="topic-info">
+Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}
+</p>
+
 <hr>
 
 <h3>Posts</h3>
+
 {% for post in posts %}
-  <div style="border:1px solid #ccc; padding:5px; margin-bottom:5px;">
+<div class="post-card">
     <p>{{ post.content }}</p>
     <small>By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-  </div>
+</div>
 {% else %}
-  <p>No posts yet.</p>
+<p>No posts yet.</p>
 {% endfor %}
 
 <hr>
+
 {% if current_user.is_authenticated %}
 <h3>Add a Reply</h3>
 <form method="post">
@@ -27,4 +35,7 @@
 {% endif %}
 
 <a href="{{ url_for('main.index') }}">Back to Home</a>
+
+</div>
+
 {% endblock %}

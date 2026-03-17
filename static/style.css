@@ -1,140 +1,260 @@
+/* ========================= */
+/* RESET                     */
+/* ========================= */
+
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
+
+/* ========================= */
+/* BASE                      */
+/* ========================= */
 
 body {
     font-family: 'Arial', sans-serif;
-    line-height: 1.6; 
-    background-color: #ffffff;
-    color: #242323;
+    line-height: 1.6;
+    background-color: #0f1115;
+    color: #e0e0e0;
 }
 
-header{
+/* ========================= */
+/* HEADER                    */
+/* ========================= */
+
+header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 20px 100px;
-    background-color:#2e2e2e;
+    background: #1a1c22;
+    padding: 15px 80px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: #f0eded;
+
+    z-index: 1000;
+    border-bottom: 1px solid #222;
 }
+
+/* NAV */
 
 .link-nav a {
-    position: relative;
-    font-size: 1.1em;
-    color: #ffffff;
+    font-size: 1em;
+    color: #ccc;
     text-decoration: none;
-    font-weight: 500;
     margin-left: 20px;
+    transition: 0.3s;
 }
 
-.link-nav .btnlogin{
+.link-nav a:hover {
+    color: white;
+}
+
+/* ========================= */
+/* BUTTONS                   */
+/* ========================= */
+
+.link-nav button {
     width: 130px;
-    height: 50px;
+    height: 45px;
     background: transparent;
-    border: 2px solid, #00FF9F;
-    outline: none;
     border-radius: 10px;
-    font-size: 1.1em;
-    color: #08eb44;
-    font-weight: 500;
-    margin-left: 40px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-.link-nav .btnRegistre{
-      width: 130px;
-    height: 50px;
-    background: transparent;
-    border: 2px solid, #0b87c5;
-    outline: none;
-    border-radius: 10px;
-    font-size: 1.1em;
-    color: #08d1eb;
-    font-weight: 500;
-    margin-left: 40px;
+/* FIX border syntax */
+.btnlogin { border: 2px solid #00FF9F; color: #00FF9F; }
+.btnRegistre { border: 2px solid #00aaff; color: #00aaff; }
+.btnLogout { border: 2px solid #ff3b3b; color: #ff3b3b; }
+
+.btnlogin:hover {
+    background: #00FF9F;
+    color: black;
+    box-shadow: 0 0 15px rgba(0,255,159,0.6);
 }
 
-.link-nav .btnLogout{
-      width: 130px;
-    height: 50px;
-    background: transparent;
-    border: 2px solid, #d31717;
-    outline: none;
-    border-radius: 10px;
-    font-size: 1.1em;
-    color: #d84848;
-    font-weight: 500;
-    margin-left: 40px;
+.btnRegistre:hover {
+    background: #00aaff;
+    color: black;
+    box-shadow: 0 0 15px rgba(0,170,255,0.6);
 }
 
-.link-nav .btnlogin:hover{
-    background-color: #0e2a2a;
-    box-shadow: 0 0 15px rgba(0, 255, 159, 0.4), inset 0 0 10px rgba(0, 255, 159, 0.2);
-    text-shadow: 0 0 8px #00FF9F;
-    transform: translateY(-2px);
-}
-.link-nav .btnRegistre:hover{
-   background-color: #0e2a2a;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 157, 255, 0.2);
-    text-shadow: 0 0 8px #00FF9F;
-    transform: translateY(-2px);
+.btnLogout:hover {
+    background: #ff3b3b;
+    color: black;
+    box-shadow: 0 0 15px rgba(255,59,59,0.6);
 }
 
-.link-nav .btnLogout:hover{
-   background-color: #0e2a2a;
-    box-shadow: 0 0 15px rgba(226, 18, 46, 0.4), inset 0 0 10px rgba(255, 0, 0, 0.2);
-    text-shadow: 0 0 8px #ff2525;
-    transform: translateY(-2px);
+/* ========================= */
+/* CONTAINER                 */
+/* ========================= */
+
+.container {
+    padding-top: 120px;
+    width: 80%;
+    margin: auto;
 }
 
-.container{
-    padding-top: 100px; 
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 300px;
-}
+/* ========================= */
+/* CATEGORIES (HOME)         */
+/* ========================= */
 
 .categories {
     display: flex;
-    gap: 20px;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 50px;
 }
 
 .cat {
-    padding: 20px;
+    padding: 25px 40px;
+    border-radius: 12px;
     text-decoration: none;
     color: white;
-    border-radius: 10px;
     font-weight: bold;
+    transition: 0.3s;
 }
 
-/* couleurs catégories */
-.red { background-color: #e74c3c; }
-.blue { background-color: #3498db; }
-.purple { background-color: #9b59b6; }
-
-/* topics */
-.topics {
-    margin-top: 20px;
+/* neon hover */
+.cat:hover {
+    transform: translateY(-5px);
 }
+
+/* ========================= */
+/* CATEGORY COLORS           */
+/* ========================= */
+
+.red {
+    --main-color: #ff3b3b;
+    --glow: rgba(255, 59, 59, 0.6);
+}
+
+.blue {
+    --main-color: #00aaff;
+    --glow: rgba(0, 170, 255, 0.6);
+}
+
+.purple {
+    --main-color: #b84dff;
+    --glow: rgba(184, 77, 255, 0.6);
+}
+
+/* ========================= */
+/* TITLES                    */
+/* ========================= */
+
+h1, h2, h3 {
+    color: var(--main-color);
+    text-shadow: 0 0 10px var(--glow);
+    margin-bottom: 15px;
+}
+
+/* ========================= */
+/* TOPIC CARDS               */
+/* ========================= */
 
 .topic-card {
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 10px;
+    background: #1a1a1a;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+
+    border: 1px solid var(--main-color);
+
+    box-shadow:
+        0 0 10px var(--glow),
+        inset 0 0 5px var(--glow);
+
+    transition: 0.3s;
 }
 
-.topics.red .topic-card { background-color: #f8d7da; }
-.topics.blue .topic-card { background-color: #d6eaf8; }
-.topics.purple .topic-card { background-color: #ebdef0; }
+.topic-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 0 20px var(--glow),
+        inset 0 0 10px var(--glow);
+}
 
 .topic-card a {
+    color: var(--main-color);
     text-decoration: none;
+}
+
+/* ========================= */
+/* POSTS                     */
+/* ========================= */
+
+.post-card {
+    background: #1a1a1a;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+
+    border-left: 4px solid var(--main-color);
+
+    box-shadow: 0 0 8px var(--glow);
+}
+
+.post-card p {
+    color: #ddd;
+}
+
+.post-card small {
+    color: #888;
+}
+
+/* ========================= */
+/* FORM                      */
+/* ========================= */
+
+textarea {
+    width: 100%;
+    height: 120px;
+    background: #0f1115;
+    color: white;
+
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+
+    padding: 10px;
+
+    box-shadow: 0 0 10px var(--glow);
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+
+    background: transparent;
+    color: var(--main-color);
+
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 10px var(--glow);
+    transition: 0.3s;
+}
+
+button:hover {
+    background: var(--main-color);
     color: black;
+}
+
+/* ========================= */
+/* LINKS                     */
+/* ========================= */
+
+a {
+    color: var(--main-color);
+}
+
+a:hover {
+    text-shadow: 0 0 5px var(--glow);
 }
