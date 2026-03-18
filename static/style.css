@@ -29,8 +29,8 @@ body {
     line-height: 1.6;
 
     background:
-        radial-gradient(#ffffff22 0.8px, transparent 0.1px),
-        radial-gradient(circle at center, #000000 0%, #070b13 40%, #0d0920 100%);
+        radial-gradient(#7569a522 0.8px, transparent 0.1px),
+        radial-gradient(circle at left, #0c0e20 0%, #09020c 40%, #180707 100%);
 
     background-size:
         25px 24px,
