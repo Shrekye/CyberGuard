@@ -1,8 +1,11 @@
+import os
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
+from authlib.integrations.flask_client import OAuth
 from . import db
+from . import google
 
 main_bp = Blueprint("main", __name__)
 
@@ -41,6 +44,35 @@ def login():
         return "Invalid credentials"
     return render_template("login.html")
 
+# ---- conf auth ---
+# --- routes connexion google--
+@main_bp.route('/login/google')
+def google_login():
+    redirect_uri = url_for('main.google_authorize', _external=True) #ou Google envoi le token
+    return google.authorize_redirect(redirect_uri)
+
+# routes retour de Google
+@main_bp.route('/google/auth')
+def google_authorize():
+    token = google.authorize_access_token() # On récupère le jeton (token) envoyé par Google
+    user_info = token.get('userinfo') #info utililisateur
+    
+    if user_info:
+        email = user_info['email']
+        # On cherche si l'utilisateur existe déjà dans ta base de données
+        user = User.query.filter_by(username=email).first()
+        
+        if not user:
+            # S'il n'existe pas, on le crée automatiquement !
+            # On lui met un mot de passe bidon car il se connectera via Google
+            user = User(username=email, password="OAUTH_USER") 
+            db.session.add(user)
+            db.session.commit()
+        
+        # On utilise Flask-Login pour créer la session
+        login_user(user)
+        
+    return redirect(url_for('main.index'))
 # --- Logout ---
 @main_bp.route("/logout")
 @login_required

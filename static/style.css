@@ -258,3 +258,59 @@ a {
 a:hover {
     text-shadow: 0 0 5px var(--glow);
 }
+
+/* ========================= */
+/* Google  BTN               */
+/* ========================= */
+
+
+.btn-google {
+    display: inline-flex;
+    align-items: center;
+    background-color: #131212c2;
+    color: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 100px;
+    padding: 0; 
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    outline: none;
+}
+
+
+.google-icon-wrapper {
+    padding: 12px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.google-icon-wrapper svg {
+    width: 32px;
+    height: 32px;
+}
+
+.google-icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-text {
+    padding: 0 16px;
+    white-space: nowrap;
+}
+
+.btn-google:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+}
+
+.btn-google:active {
+    background-color: #e8eaed;
+}
+
