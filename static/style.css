@@ -125,8 +125,7 @@ header {
     justify-content: center;
     margin-top: 100px;
     flex-wrap:wrap;
-    font-family: 'CyberGuardFont',sans-serif;
-    letter-spacing: 2px;
+
 }
 
 .cat {
@@ -135,6 +134,8 @@ header {
     text-decoration: none;
     color: white;
     font-weight: bold;
+    font-family: 'CyberGuardFont',sans-serif;
+    letter-spacing: 2px;
     transition: 0.3s;
 }
 /* ========================= */
