@@ -42,15 +42,13 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background: #3432326d;
     padding: 15px 80px;
-
+    font-family: 'Arial';
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     z-index: 1000;
-    border-bottom: 1px solid #222;
 }
 
 /* NAV */
@@ -82,14 +80,14 @@ header {
 }
 
 /* FIX border syntax */
-.btnlogin { border: 2px solid #00FF9F; color: #00FF9F; }
+.btnlogin { border: 2px solid #ffffff; color: #ffffff; }
 .btnRegistre { border: 2px solid #00aaff; color: #00aaff; }
 .btnLogout { border: 2px solid #ff3b3b; color: #ff3b3b; }
 
 .btnlogin:hover {
-    background: #00FF9F;
+    background: #ffffff;
     color: black;
-    box-shadow: 0 0 15px rgba(0,255,159,0.6);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
 }
 
 .btnRegistre:hover {
@@ -130,6 +128,7 @@ header {
 .cat {
     padding: 25px 40px;
     border-radius: 12px;
+    font-family: "Guardians";
     text-decoration: none;
     color: white;
     font-weight: bold;
@@ -146,7 +145,7 @@ header {
     text-align: center;
 }
 .i_welcome{
-    padding-top: 100px;
+    padding-top: 50px;
     font-family: 'CyberGuardFont',sans-serif;
     font-size: 4rem;
     display: flex;
@@ -164,7 +163,7 @@ header {
  .red-card, .blue_card, .purple_card {
     width: 250px;          
     height: 180px;          
-    background-color: #333333;
+    background-color: #3333335b;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -188,13 +187,14 @@ header {
     transform: translateY(0);
     border: transparent;
      box-shadow:
-        inset 0 0 60px rgb(255, 46, 46),
-        inset 20px 0 80px rgb(192, 47, 47),
-        inset -20px 0 80px rgb(161, 26, 60),
-        inset 20px 0 300px rgb(255, 11, 11), 
-        inset -20px 0 300px rgb(255, 200, 200),
-        0 0 50px #fff,
-        -10px 0 80px rgb(255, 0, 0),
+  inset 0 0 60px rgba(255, 0, 0, 0.8),      /* Rouge vif */
+        inset 20px 0 80px rgb(255, 18, 18),         /* Rouge sombre gauche */
+        inset -20px 0 80px rgba(209, 30, 30, 0.677),        /* Rouge sombre droite */
+        inset 20px 0 300px rgb(200, 0, 0),        /* Grand halo rouge */
+        inset -20px 0 300px rgb(100, 0, 0),       /* Ombre rouge profond */
+        
+        0 0 20px rgba(255, 0, 0, 0.5),            /* Petit halo externe */
+        -10px 0 80px rgb(255, 0, 0),              /* Diffusion rouge gauche */
         10px 0 80px rgb(255, 0, 0);
 }
 
@@ -216,7 +216,7 @@ header {
     border: transparent;
      box-shadow:
      inset 0 0 60px whitesmoke,
-    inset 20px 0 80px #f0f,
+    inset 20px 0 80px rgb(255, 0, 195),
     inset -20px 0 80px #0ff,
     inset 20px 0 300px #f0f,
     inset -20px 0 300px #0ff,
