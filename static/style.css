@@ -19,7 +19,7 @@
     font-style: normal;
 }
 @font-face {
-    font-family: "Guardians";;
+    font-family: "Guardians";
     src: url("../static/Guardians.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
@@ -125,6 +125,8 @@ header {
     justify-content: center;
     margin-top: 100px;
     flex-wrap:wrap;
+    font-family: 'CyberGuardFont',sans-serif;
+    letter-spacing: 2px;
 }
 
 .cat {
