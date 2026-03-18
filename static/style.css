@@ -25,9 +25,17 @@
     font-style: normal;
 }
 body {
-    font-style: "CyberGuardFont",sans-serif;
+    font-family: "CyberGuardFont", sans-serif;
     line-height: 1.6;
-    background: radial-gradient(circle at center, #0d1625 0%, #070b13 40%, #000000 100%);
+
+    background:
+        radial-gradient(#ffffff22 0.8px, transparent 0.1px),
+        radial-gradient(circle at center, #000000 0%, #070b13 40%, #0d0920 100%);
+
+    background-size:
+        20px 20px,
+        auto;
+
     color: #e0e0e0;
 }
 
@@ -133,7 +141,7 @@ header {
     text-decoration: none;
     color: white;
     font-weight: bold;
-    font-family: 'CyberGuardFont',sans-serif;
+    font-family: 'Guardians',sans-serif;
     letter-spacing: 2px;
     transition: 0.3s;
 }
