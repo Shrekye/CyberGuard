@@ -1,13 +1,21 @@
+
 {% extends "base.html" %}
 
 {% block content %}
-
-<h1>Choose a category</h1>
-
+<div class ="txt_block_i">
+    <h1 class="i_welcome">Welcome in CyberGuard </h1>
+    <h2 class="sub-title_index">choose your chat </h2>
+</div>
 <div class="categories">
-    <a href="{{ url_for('main.category_view', category='red') }}" class="cat red">Red</a>
-    <a href="{{ url_for('main.category_view', category='blue') }}" class="cat blue">Blue</a>
-    <a href="{{ url_for('main.category_view', category='purple') }}" class="cat purple">Purple</a>
+    <div class="red-card">
+        <a href="{{ url_for('main.category_view', category='red') }}" class="cat red">Red</a>
+    </div>
+    <div class="purple_card">
+        <a href="{{ url_for('main.category_view', category='purple') }}" class="cat purple">Purple</a>
+    </div>
+    <div class="blue_card">
+        <a href="{{ url_for('main.category_view', category='blue') }}" class="cat blue">Blue</a>
+    </div>
 </div>
 
 {% endblock %}
