@@ -19,8 +19,21 @@
             </g>
         </svg>
 
-
         <nav class="link-nav ">
+            <audio id="audio" loop>
+                <source src="{{ url_for('static', filename='cyberpunk.mp3')}}" type="audio/mpeg">
+            </audio>
+
+            <button onclick="toggleMusic()" class="btn-music">
+                <svg id= "play" width="20" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5V19L19 12L8 5Z" fill="white"/>
+                </svg>
+                <svg id="pause" width="20" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="white"/>
+                </svg>
+            </button>
+            <input type="range" id="volume" claas= "sond-bar" name="volume" min="0" max="1" step="0.01" value="0.5" />
+
             <a href="{{ url_for('main.index') }}">Home</a>
             <a href="{{ url_for('main.create_topic') }}">New Topic</a>
 
@@ -41,6 +54,7 @@
     </header>
     <div class="container">
     {% block content %}{% endblock %}
+    <script src="/static/audio.js"></script>
     </div>
 </body>
 </html>

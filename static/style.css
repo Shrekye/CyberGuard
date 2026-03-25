@@ -50,12 +50,11 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 15px 80px;
+    padding: 10px 80px;
     font-family: 'Arial';
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     z-index: 1000;
 }
 
@@ -72,6 +71,11 @@ header {
 .link-nav a:hover {
     color: white;
 }
+
+.btn-music{
+    margin-left: 10px;
+}
+.sond-bar
 
 /* ========================= */
 /* BUTTONS                   */
