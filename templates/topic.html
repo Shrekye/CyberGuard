@@ -15,7 +15,7 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 
 {% for post in posts %}
 <div class="post-card">
-    <p>{{ post.content }}</p>
+    <p class="Cpost">{{ post.content }}</p>
     <small>By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
 </div>
 {% else %}
@@ -27,7 +27,7 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 {% if current_user.is_authenticated %}
 <h3>Add a Reply</h3>
 <form method="post">
-    <textarea name="content" placeholder="Write your reply here..." required></textarea><br><br>
+    <textarea name="content" placeholder="Write your reply here..." required maxlength="600"></textarea><br><br>
     <button type="submit">Post Reply</button>
 </form>
 {% else %}
