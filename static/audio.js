@@ -6,6 +6,7 @@ const pausebtn=document.getElementById("pause");
 
 playbtn.style.display = "block";
 pausebtn.style.display = "none";
+
 function toggleMusic() {
     if (music.paused){
         music.play();

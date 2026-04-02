@@ -1,11 +1,14 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for
+
+from flask import Blueprint, render_template, request, redirect, url_for,session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from authlib.integrations.flask_client import OAuth
 from . import db
 from . import google
+import secrets
+import time
 
 main_bp = Blueprint("main", __name__)
 
@@ -35,13 +38,28 @@ def register():
 @main_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+
+        if 'attend' not in session:
+            session['attend'] = 2
+
         username = request.form["username"].strip()
         password = request.form["password"]
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
+        
+        
+        if session['attend'] <= 0:
+            time.sleep(5) 
+            session['attend'] = 2 
+            return render_template("Trop de tentatives, réessayez plus tard.")
+
+        if user and check_password_hash(user.password, password) and attend > 0:
             login_user(user)
+            attend = 2
             return redirect(url_for("main.index"))
-        return "Invalid credentials"
+        else:
+            session['attend'] -= 1
+            error_msg = f"Identifiants invalides. Tentatives restantes : {session['attend']}"
+            return "Invalid credentials"
     return render_template("login.html")
 
 # ---- conf auth ---
@@ -65,7 +83,7 @@ def google_authorize():
         if not user:
             # S'il n'existe pas, on le crée automatiquement !
             # On lui met un mot de passe bidon car il se connectera via Google
-            user = User(username=email, password="OAUTH_USER") 
+            user = User(username=email, password= secrets.token_urlsafe(32)) 
             db.session.add(user)
             db.session.commit()
         
