@@ -28,12 +28,11 @@ body {
     font-family: "CyberGuardFont", sans-serif;
     line-height: 1.6;
 
-    background:
-        radial-gradient(#7569a522 0.8px, transparent 0.1px),
-        radial-gradient(circle at left, #0c0e20 0%, #09020c 40%, #180707 100%);
+    background-image: url("../static/1383930.png");
+        
 
     background-size:
-        25px 24px,
+        1920px 1400px,
         auto;
 
     color: #e0e0e0;
@@ -178,12 +177,12 @@ header {
  .red-card, .blue_card, .purple_card {
     width: 250px;          
     height: 180px;          
-    background-color: #3333335b;
+    background-color: #0000007a;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.664);
 }
 .red-card{
     border: 2px solid #ff3b3b;
@@ -202,42 +201,42 @@ header {
     transform: translateY(0);
     border: transparent;
      box-shadow:
-  inset 0 0 60px rgba(255, 0, 0, 0.8),      /* Rouge vif */
-        inset 20px 0 80px rgb(255, 18, 18),         /* Rouge sombre gauche */
+  inset 0 0 60px rgba(253, 44, 44, 0.418),      /* Rouge vif */
+        inset 20px 0 80px rgba(255, 53, 53, 0.445),         /* Rouge sombre gauche */
         inset -20px 0 80px rgba(209, 30, 30, 0.677),        /* Rouge sombre droite */
-        inset 20px 0 300px rgb(200, 0, 0),        /* Grand halo rouge */
-        inset -20px 0 300px rgb(100, 0, 0),       /* Ombre rouge profond */
+        inset 20px 0 300px rgba(255, 30, 60, 0.308),        /* Grand halo rouge */
+        inset -20px 0 300px rgba(179, 0, 0, 0.253),       /* Ombre rouge profond */
         
-        0 0 20px rgba(255, 0, 0, 0.5),            /* Petit halo externe */
-        -10px 0 80px rgb(255, 0, 0),              /* Diffusion rouge gauche */
-        10px 0 80px rgb(255, 0, 0);
+        0 0 20px rgba(255, 0, 0, 0.425),            /* Petit halo externe */
+        -10px 0 80px rgba(255, 37, 37, 0.384),              /* Diffusion rouge gauche */
+        10px 0 80px rgba(255, 52, 52, 0.404);
 }
 
 .blue_card:hover{
     transform: translateY(0);
     border: transparent;
      box-shadow:
-    inset 0 0 60px rgb(3, 255, 171),     
-        inset 20px 0 80px rgb(103, 47, 192),   
-        inset -20px 0 80px rgb(35, 26, 161),  
-        inset 20px 0 300px rgb(10, 140, 201), 
-        inset -20px 0 300px rgb(200, 255, 248),
+    inset 0 0 60px rgb(3, 255, 171, 0.418),     
+        inset 20px 0 80px rgb(103, 47, 192, 0.445),   
+        inset -20px 0 80px rgb(35, 26, 161, 0.677),  
+        inset 20px 0 300px rgba(10, 140, 201, 0.212), 
+        inset -20px 0 300px rgb(200, 255, 248, 0.253),
         0 0 50px #fff,                        
-        -10px 0 80px rgb(0, 247, 255),        
-        10px 0 80px rgb(0, 204, 255);
+        -10px 0 80px rgb(0, 247, 255, 0.425),        
+        10px 0 80px rgb(0, 204, 255, 0.404);
 }
 .purple_card:hover{
     transform: translateY(0);
     border: transparent;
      box-shadow:
      inset 0 0 60px whitesmoke,
-    inset 20px 0 80px rgb(255, 0, 195),
-    inset -20px 0 80px #0ff,
-    inset 20px 0 300px #f0f,
-    inset -20px 0 300px #0ff,
+    inset 20px 0 80px rgba(255, 0, 195, 0.322),
+    inset -20px 0 80px rgba(0, 255, 255, 0.267),
+    inset 20px 0 300px rgba(255, 0, 255, 0.452),
+    inset -20px 0 300px rgba(0, 255, 255, 0.384),
     0 0 50px #fff,
-    -10px 0 80px #f0f,
-    10px 0 80px #0ff;
+    -10px 0 80px rgba(253, 81, 253, 0.377),
+    10px 0 80px rgba(80, 255, 255, 0.363);
 }
 /* neon hover */
 .cat:hover {
@@ -327,6 +326,51 @@ h1, h2, h3 {
     color: #888;
 }
 
+/* ========================= */
+/* REGISTER                  */
+/* ========================= */
+
+.registerC {
+    width: 360px;
+    height: 720px;
+    background: rgba(0, 0, 0, 0.493);
+    border: 1px solid #ffffffb7;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 37%;
+    margin-top: 3%;
+}
+
+.formR {
+    width: 80%;
+    text-align: center;
+}
+
+.inputR {
+    width: 100%;
+    padding: 10px;
+    margin: 25px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.buttonR {
+    width: 100%;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 50%;
+}
+
+.buttonR:hover {
+    background-color: #4ba2ff;
+}
 /* ========================= */
 /* FORM                      */
 /* ========================= */
