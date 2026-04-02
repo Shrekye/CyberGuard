@@ -14,7 +14,7 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 <h3>Posts</h3>
 
 {% for post in posts %}
-<div class="post-card">
+<div class="post-card {{ category }}">
     <p>{{ post.content }}</p>
     <small>By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
 </div>
@@ -27,6 +27,7 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 {% if current_user.is_authenticated %}
 <h3>Add a Reply</h3>
 <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <textarea name="content" placeholder="Write your reply here..." required></textarea><br><br>
     <button type="submit">Post Reply</button>
 </form>
