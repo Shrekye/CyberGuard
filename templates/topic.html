@@ -14,13 +14,8 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 <h3>Posts</h3>
 
 {% for post in posts %}
-<<<<<<< HEAD
-<div class="post-card">
-    <p class="Cpost">{{ post.content }}</p>
-=======
 <div class="post-card {{ category }}">
-    <p>{{ post.content }}</p>
->>>>>>> 272d523d50a17da78782ea3dbc7aacfd1e592979
+    <p class="Cpost">{{ post.content }}</p>
     <small>By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
 </div>
 {% else %}
@@ -32,12 +27,8 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 {% if current_user.is_authenticated %}
 <h3>Add a Reply</h3>
 <form method="post">
-<<<<<<< HEAD
-    <textarea name="content" placeholder="Write your reply here..." required maxlength="600"></textarea><br><br>
-=======
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <textarea name="content" placeholder="Write your reply here..." required></textarea><br><br>
->>>>>>> 272d523d50a17da78782ea3dbc7aacfd1e592979
+    <textarea name="content" placeholder="Write your reply here..." required maxlength="600"></textarea><br><br>
     <button type="submit">Post Reply</button>
 </form>
 {% else %}
