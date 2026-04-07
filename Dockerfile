@@ -13,4 +13,4 @@ COPY --chown=nonroot:nonroot . .
 USER nonroot
 EXPOSE 5000
 
-CMD ["/usr/bin/python", "/app/run.py"]
+CMD ["/usr/bin/python", "run.py"]
