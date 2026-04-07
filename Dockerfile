@@ -24,4 +24,5 @@ USER nonroot
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+ENTRYPOINT ["python"]
+CMD ["run.py"]
