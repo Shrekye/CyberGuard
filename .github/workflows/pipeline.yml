@@ -1,34 +1,39 @@
-name: gitleaks
-on: [pull_request, push]
-  branches:
-    - main
-    - develop
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
 jobs:
-  scan:
-    name: gitleaks
+
+  gitleaks:
+    name: Gitleaks Scan
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-name: flake8 Lint
-on: [push, pull_request]
-  branches:
-    - main
-    - develop
-needs: gitleaks
-jobs:
   flake8-lint:
+    name: Flake8 Lint
     runs-on: ubuntu-latest
-    name: Lint
+    needs: gitleaks
+
     steps:
-      - name: Check out source repository
-        uses: actions/checkout@v3
-      - name: Set up Python environment
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
@@ -61,3 +66,37 @@ jobs:
       
       - name: export artifact
         uses: actions/upload-artifacct
+
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Create flake8 config
+        run: |
+          echo "[flake8]" > .flake8
+          echo "max-line-length = 120" >> .flake8
+
+      - name: Run flake8
+        run: flake8 . | true
+
+  pip-audit:
+    name: pip-audit security scan
+    runs-on: ubuntu-latest
+    needs: flake8-lint
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: pip-audit
