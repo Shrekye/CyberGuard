@@ -155,7 +155,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y nikto
 
       - name: Run Nikto scan
-        run: nikto -h http://host.docker.internal:5000 -output nikto_report.txt
+        run: nikto -h http://localhost:5000 -output nikto_report.txt
 
       - name: Upload Nikto report
         uses: actions/upload-artifact@v4
