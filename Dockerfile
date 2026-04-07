@@ -8,18 +8,22 @@ RUN apt-get update && \
         libssl-dev \
         python3-dev \
         && rm -rf /var/lib/apt/lists/*
+        
 COPY requirements.txt .
-RUN python -m pip install --upgrade pip setuptools wheel && \
-    pip install --prefix=/install -r requirements.txt
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 WORKDIR /app
+
 COPY --from=builder /install /usr/local
-COPY . .
+COPY --chown=nonroot:nonroot . .
+
+COPY --chown=nonroot:nonroot docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 USER nonroot
 
 EXPOSE 5000
 
-CMD ["/usr/bin/python", "run.py"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
