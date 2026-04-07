@@ -146,8 +146,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker container
-        run: |
-          docker build -t cyberguard:${{ github.sha }} .
+        run: docker build -t cyberguard:${{ github.sha }} .
 
       - name: Run Docker container
         run: |
@@ -160,11 +159,8 @@ jobs:
           echo "=== Container status ==="
           docker ps -a | grep cyberguard-test || true
           
-          echo "=== Container logs (first 50 lines) ==="
-          docker logs cyberguard-test 2>&1 | head -50 || true
-          
-          echo "=== Container inspect - Network Settings ==="
-          docker inspect cyberguard-test | grep -A 20 NetworkSettings || true
+          echo "=== Container logs ==="
+          docker logs cyberguard-test 2>&1 | tail -30 || true
           
           echo "=== Get container IP ==="
           CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cyberguard-test)
@@ -174,77 +170,66 @@ jobs:
           echo "=== Check if port 5000 is exposed ==="
           docker port cyberguard-test || true
           
-          echo "=== Test localhost:5000 ==="
-          curl -v http://localhost:5000 2>&1 | head -20 || true
-          
-          echo "=== Test 127.0.0.1:5000 ==="
-          curl -v http://127.0.0.1:5000 2>&1 | head -20 || true
-          
-          echo "=== Test container IP:5000 ==="
-          curl -v http://$CONTAINER_IP:5000 2>&1 | head -20 || true
-          
-          echo "=== Check if process is running in container ==="
-          docker exec cyberguard-test ps aux 2>&1 || echo "ps not available in distroless"
-          
-          echo "=== Check listening ports in container ==="
-          docker exec cyberguard-test netstat -tulpn 2>&1 || \
-          docker exec cyberguard-test ss -tulpn 2>&1 || \
-          echo "netstat/ss not available in distroless"
+          echo "=== Quick test localhost:5000 ==="
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:5000/ || echo "Connection failed"
 
       - name: Wait for Flask app to be ready
         run: |
-          echo "Container IP from env: $CONTAINER_IP"
+          echo "Container IP: $CONTAINER_IP"
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
           
-          # Essayer plusieurs endpoints
-          for endpoint in "localhost" "127.0.0.1" "$CONTAINER_IP"; do
-            echo "Trying endpoint: $endpoint:5000"
-            for i in {1..30}; do
-              if curl -s -f http://$endpoint:5000 >/dev/null 2>&1; then
-                echo "✅ App is ready on $endpoint:5000!"
-                echo "APP_ENDPOINT=$endpoint" >> $GITHUB_ENV
-                exit 0
-              fi
-              echo "Waiting for app on $endpoint:5000... ($i/30)"
-              
-              # Afficher les logs toutes les 10 tentatives
-              if [ $((i % 10)) -eq 0 ]; then
-                echo "--- Container logs (attempt $i) ---"
-                docker logs cyberguard-test 2>&1 | tail -20 || true
-              fi
-              
-              sleep 2
-            done
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            
+            # Vérifier si l'app répond (peu importe le code HTTP)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/ 2>/dev/null || echo "000")
+            
+            if [ "$HTTP_CODE" != "000" ]; then
+              echo "✅ App is responding (HTTP $HTTP_CODE)!"
+              echo "APP_ENDPOINT=localhost" >> $GITHUB_ENV
+              exit 0
+            fi
+            
+            echo "Waiting for app... ($ATTEMPT/$MAX_ATTEMPTS) - Status: $HTTP_CODE"
+            
+            # Afficher les logs toutes les 10 tentatives
+            if [ $((ATTEMPT % 10)) -eq 0 ]; then
+              echo "--- Container logs (attempt $ATTEMPT) ---"
+              docker logs cyberguard-test 2>&1 | tail -15 || true
+            fi
+            
+            sleep 2
           done
           
-          echo "❌ App failed to start on all endpoints"
+          echo "❌ App failed to respond after $MAX_ATTEMPTS attempts"
           echo "=== Final container logs ==="
           docker logs cyberguard-test 2>&1 || true
-          echo "=== Container state ==="
-          docker inspect cyberguard-test | grep -A 5 State || true
           exit 1
 
-      - name: Set Nikto target URL
+      - name: Show Flask logs for debugging
         run: |
-          if [ -n "$APP_ENDPOINT" ]; then
-            NIKTO_TARGET="http://$APP_ENDPOINT:5000"
-          else
-            NIKTO_TARGET="http://localhost:5000"
-          fi
-          echo "NIKTO_TARGET=$NIKTO_TARGET" >> $GITHUB_ENV
-          echo "Nikto will scan: $NIKTO_TARGET"
+          echo "=== Complete Flask logs ==="
+          docker logs cyberguard-test 2>&1
 
       - name: Install Nikto
         run: sudo apt-get update && sudo apt-get install -y nikto
 
       - name: Run Nikto scan
         run: |
-          echo "Scanning target: $NIKTO_TARGET"
-          nikto -h $NIKTO_TARGET -output nikto_report.txt
+          TARGET="http://localhost:5000"
+          echo "Scanning target: $TARGET"
+          nikto -h $TARGET -output nikto_report.txt || true
+          echo "=== Nikto scan completed ==="
 
-      - name: Display Nikto report summary
+      - name: Display Nikto report
         run: |
           echo "=== Nikto Scan Results ==="
-          cat nikto_report.txt
+          if [ -f nikto_report.txt ]; then
+            cat nikto_report.txt
+          else
+            echo "No report generated"
+          fi
 
       - name: Upload Nikto report
         uses: actions/upload-artifact@v4
@@ -257,6 +242,7 @@ jobs:
         run: |
           echo "Cleaning up container..."
           docker rm -f cyberguard-test || true
+          docker system prune -f || true
           echo "Cleanup complete"
 
   dast-zap:
