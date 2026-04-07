@@ -1,19 +1,24 @@
 FROM python:3.11-slim AS builder
 
 WORKDIR /app
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libffi-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libffi-dev \
+        libssl-dev \
+        python3-dev \
+        && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
+RUN python -m pip install --upgrade pip setuptools wheel && \
+    pip install --prefix=/install -r requirements.txt
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 WORKDIR /app
-COPY --from=builder /app /app
+COPY --from=builder /install /usr/local
+COPY . .
+
+USER nonroot
 
 EXPOSE 5000
 
