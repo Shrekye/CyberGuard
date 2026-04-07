@@ -74,7 +74,6 @@ jobs:
   pip-audit:
     name: pip-audit security scan
     runs-on: ubuntu-24.04
-    needs: bandit-scan
     steps:
       - uses: actions/checkout@v3
 
