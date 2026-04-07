@@ -11,25 +11,24 @@ RUN apt-get update && \
         python3-dev \
         && rm -rf /var/lib/apt/lists/*
 
+ENV PATH="$VENV/bin:$PATH"
 COPY requirements.txt .
-RUN $VENV/bin/pip install --upgrade pip && \
-    $VENV/bin/pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
-ENV VENV=/opt/venv
-
 WORKDIR /app
 
-COPY --from=builder $VENV $VENV
+COPY --from=builder /opt/venv /opt/venv
 
 COPY --chown=nonroot:nonroot . .
 
-ENV PATH="$VENV/bin:$PATH"
-ENV PYTHONPATH="$VENV/lib/python3.11/site-packages"
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
 
 USER nonroot
 
 EXPOSE 5000
 
-ENTRYPOINT ["/opt/venv/bin/python", "run.py"]
+ENTRYPOINT ["python", "run.py"]
