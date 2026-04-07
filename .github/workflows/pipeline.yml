@@ -14,7 +14,7 @@ jobs:
 
   gitleaks:
     name: Gitleaks Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -26,7 +26,7 @@ jobs:
 
   flake8-lint:
     name: Flake8 Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: gitleaks
     steps:
       - uses: actions/checkout@v3
@@ -49,7 +49,7 @@ jobs:
 
   bandit-scan:
     name: SAST Bandit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: flake8-lint
     steps:
       - uses: actions/checkout@v3
@@ -73,7 +73,7 @@ jobs:
 
   pip-audit:
     name: pip-audit security scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: bandit-scan
     steps:
       - uses: actions/checkout@v3
@@ -91,3 +91,50 @@ jobs:
 
       - name: Run pip-audit
         run: pip-audit
+    
+  trivy-unprebuild:
+    name: Trivy Scan PreBuild
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: Shrekye/CyberGuard
+          ref: develop
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: fs
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          path: .
+
+  trivy-postbuild:
+    name: Trivy Scan PostBuild Docker Image
+    runs-on: ubuntu-24.04
+    needs: trivy-unprebuild
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: Shrekye/CyberGuard
+          ref: develop
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c .
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
