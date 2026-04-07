@@ -110,7 +110,7 @@ def google_authorize():
         if not user:
             # S'il n'existe pas, on le crée automatiquement !
             # On lui met un mot de passe bidon car il se connectera via Google
-            user = User(username=email, password="OAUTH_USER") 
+            user = User(username=email, password=secrets.token_urlsafe(32)) 
             db.session.add(user)
             db.session.commit()
 
