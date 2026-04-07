@@ -22,4 +22,4 @@ USER nonroot
 
 EXPOSE 5000
 
-CMD ["run.py"]
+CMD ["/usr/bin/python", "run.py"]
