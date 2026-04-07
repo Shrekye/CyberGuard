@@ -9,32 +9,28 @@ RUN apt-get update && \
         && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
-COPY requirements.txt .
 
-RUN pip install \
-    --target=/install \
-    --no-cache-dir \
-    --no-compile \
-    -r requirements.txt
+COPY requirements.txt .
+RUN pip install --target=/packages --no-cache-dir -r requirements.txt
 
 COPY . /app-src
-
 RUN find /app-src -name "*.pyc" -delete && \
-    find /app-src -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+    find /app-src -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find /app-src -type f -name "*.py" -exec dos2unix {} \; 2>/dev/null || true
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
-COPY --from=builder /install /usr/lib/python3.11/site-packages/
+COPY --from=builder /packages /usr/lib/python3.11/site-packages/
 
 COPY --from=builder --chown=nonroot:nonroot /app-src /app
 
 WORKDIR /app
 
 ENV PYTHONPATH=/usr/lib/python3.11/site-packages
-ENV PYTHONUNBUFFERED=1
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
 USER nonroot
-
 EXPOSE 5000
 
-CMD ["/usr/bin/python3.11", "/app/run.py"]
+CMD ["python3.11", "/app/run.py"]
