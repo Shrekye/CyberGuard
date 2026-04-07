@@ -1,5 +1,8 @@
 name: CI Pipeline
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
@@ -116,13 +119,12 @@ jobs:
       - name: Run Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          scan-type: fs
-          format: table
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          path: .
+          severity: 'CRITICAL,HIGH'
 
   trivy-postbuild:
     name: Trivy Scan PostBuild Docker Image
@@ -139,12 +141,12 @@ jobs:
       - name: Run Trivy image scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: cyberguard-local:${{ github.sha }}
-          format: table
+          image-ref: 'cyberguard-local:${{ github.sha }}'
+          format: 'table'
+          scan-type: 'image'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
+          severity: 'CRITICAL,HIGH'
   
   dast_nikto:
     name: DAST Nikto Scan
@@ -278,10 +280,7 @@ jobs:
           uses: zaproxy/action-full-scan@v0.10.0
           with:
             target: 'http://127.0.0.1:5000'
-            args: |
-              -J report_json.json
-              -w report_md.md
-              -r report_html.html
+            cmd_options: '-J report_json.json -w report_md.md -r report_html.html'  # Utiliser cmd_options au lieu de args
 
         - name: Upload ZAP reports
           if: always()
