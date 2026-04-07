@@ -1,12 +1,13 @@
 import os
-import secrets
-from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from authlib.integrations.flask_client import OAuth
 from . import db
 from . import google
+import secrets
+import time
 
 main_bp = Blueprint("main", __name__)
 
@@ -75,20 +76,15 @@ def register():
 def login():
 
     if request.method == "POST":
-
-        validate_csrf()
-
         username = request.form["username"].strip()
         password = request.form["password"]
 
         user = User.query.filter_by(username=username).first()
-
         if user and check_password_hash(user.password, password):
             login_user(user)
+            attend = 2
             return redirect(url_for("main.index"))
-
         return "Invalid credentials"
-
     return render_template("login.html")
 
 # =========================
@@ -112,9 +108,9 @@ def google_authorize():
         user = User.query.filter_by(username=email).first()
 
         if not user:
-
-            user = User(username=email, password="OAUTH_USER")
-
+            # S'il n'existe pas, on le crée automatiquement !
+            # On lui met un mot de passe bidon car il se connectera via Google
+            user = User(username=email, password="OAUTH_USER") 
             db.session.add(user)
             db.session.commit()
 
