@@ -11,4 +11,4 @@ WORKDIR /app
 COPY --from=builder /app /app
 EXPOSE 5000
 
-CMD ["python3", "run.py"]
+CMD ["run.py"]
