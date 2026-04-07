@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h2>Create New Topic</h2>
 <br>
 <form method="post">
-  <input type="text" name="title" placeholder="Topic title" required><br><br>
-  <textarea name="content" placeholder="Your first post"></textarea><br><br>
-  <select name="category" required>
-    <option value="red">Red</option>
-    <option value="blue">Blue</option>
-    <option value="purple">Purple</option>
-  </select><br><br>
-  <button type="submit">Create Topic</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="title" placeholder="Topic title" required maxlength="100"><br><br>
+    <textarea name="content" placeholder="Your first post" maxlength="600"></textarea><br><br>
+    <select name="category" required>
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+        <option value="purple">Purple</option>
+    </select><br><br>
+    <button type="submit">Create Topic</button>
 </form>
+
 {% endblock %}

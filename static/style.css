@@ -268,7 +268,7 @@ header {
 
 h1, h2, h3 {
     color: var(--main-color);
-    text-shadow: 0 0 10px var(--glow);
+    text-shadow: 0 0 15px var(--glow);
     margin-bottom: 15px;
 }
 
@@ -318,6 +318,12 @@ h1, h2, h3 {
     box-shadow: 0 0 8px var(--glow);
 }
 
+.Cpost {
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .post-card p {
     color: #ddd;
 }
@@ -331,8 +337,8 @@ h1, h2, h3 {
 /* ========================= */
 
 .registerC {
-    width: 360px;
-    height: 720px;
+    width: 18.75vw;
+    height: 66.67vh;
     background: rgba(0, 0, 0, 0.493);
     border: 1px solid #ffffffb7;
     border-radius: 16px;

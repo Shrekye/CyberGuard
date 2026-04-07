@@ -38,11 +38,14 @@ cyberguard/
 - google oauth
 - dockerisation
 - db (script)
+- Music
+- CSS
+- limiter le nombre de caractere (taille) / requete trop lourde (DOS)
+- et mettre le text pour les topic dans la div pour aps qu'il sorte
+- CSP, CSRF, cle dans le init
 
 ## TO DO
 
-- CSS
-- Music
 - CV easter eggggggggggg
 - account page (delete, password change)
 - login (forgot password)
