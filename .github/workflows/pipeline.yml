@@ -39,5 +39,8 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install flake8
+        run: pip install flake8
+
       - name: Run flake8
-        uses: py-actions/flake8@v2
+        run: flake8 .
