@@ -17,13 +17,11 @@ FROM gcr.io/distroless/python3-debian12:nonroot
 WORKDIR /app
 
 COPY --from=builder /install /usr/local
-COPY --chown=nonroot:nonroot . .
 
-COPY --chown=nonroot:nonroot docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+COPY --chown=nonroot:nonroot . .
 
 USER nonroot
 
 EXPOSE 5000
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["python", "/app/run.py"]
