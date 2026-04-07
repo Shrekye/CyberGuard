@@ -50,3 +50,4 @@ cyberguard/
 - account page (delete, password change)
 - login (forgot password)
 - chat/topic (images)
+- Ruff
