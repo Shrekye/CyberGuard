@@ -1,10 +1,11 @@
 import os
-from flask import Flask, session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_talisman import Talisman
 from authlib.integrations.flask_client import OAuth
 from datetime import timedelta
+
 
 # ======================
 # EXTENSIONS
@@ -14,6 +15,7 @@ login_manager = LoginManager()
 oauth = OAuth()
 google = None  # sera défini dans create_app
 
+
 def create_app():
     global google
 
@@ -21,14 +23,14 @@ def create_app():
     # APP INIT
     # ======================
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
-    
+
     app.config["SECRET_KEY"] = os.environ.get(
         "SECRET_KEY",
         "dev-secret-change-this-in-production-please"
     )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///forum.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
+
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SECURE'] = False
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -65,10 +67,10 @@ def create_app():
         "frame-ancestors": ["'none'"],
         "object-src": ["'none'"]
     }
-    
+
     Talisman(
-        app, 
-        content_security_policy=csp, 
+        app,
+        content_security_policy=csp,
         force_https=False,
         session_cookie_secure=False,
         session_cookie_http_only=True,

@@ -2,6 +2,7 @@ from datetime import datetime
 from . import db
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -11,11 +12,13 @@ class User(UserMixin, db.Model):
     blue_topics = db.relationship("BlueTopic", backref="user", cascade="all, delete-orphan")
     purple_topics = db.relationship("PurpleTopic", backref="user", cascade="all, delete-orphan")
 
+
 class RedTopic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class BlueTopic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -23,11 +26,13 @@ class BlueTopic(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class PurpleTopic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
