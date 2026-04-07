@@ -137,7 +137,7 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
   
- dast_nikto:
+  dast_nikto:
     name: DAST Nikto Scan
     runs-on: ubuntu-24.04
 #    needs: trivy-postbuild
