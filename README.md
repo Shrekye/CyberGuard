@@ -40,9 +40,9 @@ cyberguard/
 - db (script)
 - Music
 - CSS
-- limiter le nombre de caractere (taille) / requete trop lourde
+- limiter le nombre de caractere (taille) / requete trop lourde (DOS)
 - et mettre le text pour les topic dans la div pour aps qu'il sorte
-- CSP, CSRF-SSRF, cle dans le init
+- CSP, CSRF, cle dans le init
 
 ## TO DO
 
