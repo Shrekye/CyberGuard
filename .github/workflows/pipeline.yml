@@ -35,5 +35,29 @@ jobs:
       - name: flake8 Lint
         uses: py-actions/flake8@v2
 
+name: SAST_bandit
+on: [push, pull_request]
+  branches:
+    - main
+    - develop
+needs: flake8 Lint
+jobs:
+    runs-on: ubuntu-latest
+    name: bendit 
+    steps:
+      - name: Scan bandit
+        uses: actions/checkout@v3
 
-
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version:"3.11"
+      - name: Install bandit
+        run: pip install bandit
+      - name: bandit scan
+        run: bandit -r . --severity---severity-level
+      - name: raport en json
+        run: bandit-r.-f json -o bandit-report.json
+      
+      - name: export artifact
+        uses: actions/upload-artifacct
