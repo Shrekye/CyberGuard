@@ -114,25 +114,22 @@ jobs:
           path: .
 
   trivy-postbuild:
-    name: Trivy Scan PostBuild Docker Image
+    name: Trivy Scan – Post‑Build Docker Image
     runs-on: ubuntu-24.04
     needs: trivy-unprebuild
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          repository: Shrekye/CyberGuard
-          ref: develop
 
-      - name: Build Docker image
+      - name: Build Docker image locally
         run: |
           docker build \
-            -t docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c .
+            -t cyberguard-local:${{ github.sha }} .
 
       - name: Run Trivy image scan
-        uses: aquasecurity/trivy-action@0.35.0
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
-          image-ref: docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c
+          image-ref: cyberguard-local:${{ github.sha }}
           format: table
           exit-code: '1'
           ignore-unfixed: true
