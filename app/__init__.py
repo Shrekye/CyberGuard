@@ -1,9 +1,10 @@
 import os
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_talisman import Talisman
 from authlib.integrations.flask_client import OAuth
+from datetime import timedelta
 
 # ======================
 # EXTENSIONS
@@ -20,12 +21,18 @@ def create_app():
     # APP INIT
     # ======================
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
+    
     app.config["SECRET_KEY"] = os.environ.get(
         "SECRET_KEY",
-        "dev-secret-change-this"
+        "dev-secret-change-this-in-production-please"
     )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///forum.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SECURE'] = False
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 
     # ======================
     # INIT EXTENSIONS
@@ -33,6 +40,7 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "main.login"
+    login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
     oauth.init_app(app)
 
     # ======================
@@ -47,7 +55,7 @@ def create_app():
     )
 
     # ======================
-    # CSP POLICY
+    # CSP POLICY (déjà bien configurée)
     # ======================
     csp = {
         "default-src": ["'self'"],
@@ -57,7 +65,15 @@ def create_app():
         "frame-ancestors": ["'none'"],
         "object-src": ["'none'"]
     }
-    Talisman(app, content_security_policy=csp, force_https=False)
+    
+    Talisman(
+        app, 
+        content_security_policy=csp, 
+        force_https=False,
+        session_cookie_secure=False,
+        session_cookie_http_only=True,
+        strict_transport_security=False
+    )
 
     # ======================
     # BLUEPRINTS
