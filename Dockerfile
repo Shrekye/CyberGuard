@@ -26,9 +26,10 @@ COPY --from=builder $VENV $VENV
 COPY --chown=nonroot:nonroot . .
 
 ENV PATH="$VENV/bin:$PATH"
+ENV PYTHONPATH="$VENV/lib/python3.11/site-packages"
 
 USER nonroot
 
 EXPOSE 5000
 
-ENTRYPOINT ["python", "run.py"]
+ENTRYPOINT ["/opt/venv/bin/python", "run.py"]
