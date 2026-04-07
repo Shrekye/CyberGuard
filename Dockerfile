@@ -11,20 +11,19 @@ RUN apt-get update && \
 COPY requirements.txt /app/
 WORKDIR /app
 RUN pip install --target=/packages --no-cache-dir -r requirements.txt
+COPY . .
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 COPY --from=builder /packages /usr/lib/python3.11/site-packages/
-
-COPY --chown=nonroot:nonroot . /app
+COPY --from=builder --chown=nonroot:nonroot /app /app
 
 WORKDIR /app
 
 ENV PYTHONPATH=/usr/lib/python3.11/site-packages
-ENV PYTHONUNBUFFERED=1
 
 USER nonroot
 
 EXPOSE 5000
 
-CMD ["python3", "run.py"]
+CMD ["/usr/bin/python3.11", "run.py"]
