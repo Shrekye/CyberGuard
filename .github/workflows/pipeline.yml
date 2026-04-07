@@ -74,7 +74,6 @@ jobs:
   pip-audit:
     name: pip-audit security scan
     runs-on: ubuntu-24.04
-    needs: bandit-scan
     steps:
       - uses: actions/checkout@v3
 
@@ -115,7 +114,7 @@ jobs:
           path: .
 
   trivy-postbuild:
-    name: Trivy Scan – Post‑Build Docker Image
+    name: Trivy Scan PostBuild Docker Image
     runs-on: ubuntu-24.04
     needs: trivy-unprebuild
     steps:
@@ -148,9 +147,9 @@ jobs:
       - name: Build and run Docker container
         run: |
           docker build -t cyberguard:${{ github.sha }} .
-          docker run -d --network host --name cyberguard-test cyberguard:${{ github.sha }}
+          docker run -d --name cyberguard-test cyberguard:${{ github.sha }}
 
-      - name: Wait for Flask app
+      - name: Wait for Flask app to be ready
         run: |
           for i in {1..30}; do
             if curl -s -f http://localhost:5000 >/dev/null 2>&1; then
@@ -176,5 +175,26 @@ jobs:
           name: nikto-report
           path: nikto_report.txt
 
-      - name: Cleanup
+      - name: Cleanup Docker container
         run: docker rm -f cyberguard-test
+
+    dast-zap:
+      name: owaspzap
+      runs-on: ubuntu-24.04
+      needs: trivy-unprebuild
+      steeps:
+        - name: Lancer app 
+          run: |
+            docker run -d\
+            --name hackboard\
+            -p 5000:5000\
+            ${{secrets.DOCKERHUB_USERNAME}}/h
+            ackboard:${{github.sha}}
+            sleep 5
+
+        - users: zaproxy/action-baseline@v0.12.0
+          with:
+            target:'http://127.0.0.1:5000'
+            cmd_options:'-a'
+        - name: Cleanup Docker container
+          run: docker rm -f cyberguard-test
