@@ -1,39 +1,43 @@
-name: gitleaks
-on: [pull_request, push]
-  branches:
-    - main
-    - develop
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
 jobs:
-  scan:
-    name: gitleaks
+
+  gitleaks:
+    name: Gitleaks Scan
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-name: flake8 Lint
-on: [push, pull_request]
-  branches:
-    - main
-    - develop
-needs: gitleaks
-jobs:
   flake8-lint:
+    name: Flake8 Lint
     runs-on: ubuntu-latest
-    name: Lint
+    needs: gitleaks
+
     steps:
       - name: Check out source repository
         uses: actions/checkout@v3
+
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: flake8 Lint
+
+      - name: Run flake8
         uses: py-actions/flake8@v2
-
-
-
