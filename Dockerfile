@@ -18,11 +18,12 @@ WORKDIR /app
 
 COPY --from=builder /install /usr/local
 
+ENV PYTHONPATH=/usr/local/lib/python3.11/site-packages
+
 COPY --chown=nonroot:nonroot . .
 
 USER nonroot
 
 EXPOSE 5000
 
-ENTRYPOINT ["python"]
-CMD ["run.py"]
+CMD ["python", "run.py"]
