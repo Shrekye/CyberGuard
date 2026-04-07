@@ -152,11 +152,6 @@ jobs:
 
       - name: Wait for Flask app to be ready
         run: |
-          # Récupère l'IP interne du container
-          CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cyberguard-test)
-          echo "Container IP: $CONTAINER_IP"
-
-          # Attend que l'app soit disponible
           for i in {1..20}; do
             if curl -s http://$CONTAINER_IP:5000 >/dev/null; then
               echo "App is ready!"
@@ -171,7 +166,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y nikto
 
       - name: Run Nikto scan
-        run: nikto -h http://$APP_IP:5000 -output nikto_report.txt
+        run: nikto -h http://localhost:5000 -output nikto_report.txt
 
       - name: Upload Nikto report
         uses: actions/upload-artifact@v4
