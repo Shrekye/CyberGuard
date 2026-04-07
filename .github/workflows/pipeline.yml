@@ -137,41 +137,41 @@ jobs:
           vuln-type: os,library
           severity: CRITICAL,HIGH
   
-dast-nikto:
-  name: DAST Nikto Scan
-  runs-on: ubuntu-24.04
-  needs: trivy-postbuild
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+  dast_nikto:
+      name: DAST Nikto Scan
+      runs-on: ubuntu-24.04
+      needs: trivy-postbuild
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-    - name: Build and run Docker container
-      run: |
-        docker build -t cyberguard:${{ github.sha }} .
-        docker run -d --network host --name cyberguard-test cyberguard:${{ github.sha }}
+        - name: Build and run Docker container
+          run: |
+            docker build -t cyberguard:${{ github.sha }} .
+            docker run -d --network host --name cyberguard-test cyberguard:${{ github.sha }}
 
-    - name: Wait for Flask app to be ready
-      run: |
-        for i in {1..20}; do
-          if curl -s http://localhost:5000 >/dev/null; then
-            echo "App is ready!"
-            break
-          fi
-          echo "Waiting for app to start..."
-          sleep 1
-        done
+        - name: Wait for Flask app to be ready
+          run: |
+            for i in {1..20}; do
+              if curl -s http://localhost:5000 >/dev/null; then
+                echo "App is ready!"
+                break
+              fi
+              echo "Waiting for app to start..."
+              sleep 1
+            done
 
-    - name: Install Nikto
-      run: sudo apt-get update && sudo apt-get install -y nikto
+        - name: Install Nikto
+          run: sudo apt-get update && sudo apt-get install -y nikto
 
-    - name: Run Nikto scan
-      run: nikto -h http://localhost:5000 -output nikto_report.txt
+        - name: Run Nikto scan
+          run: nikto -h http://localhost:5000 -output nikto_report.txt
 
-    - name: Upload Nikto report
-      uses: actions/upload-artifact@v4
-      with:
-        name: nikto-report
-        path: nikto_report.txt
+        - name: Upload Nikto report
+          uses: actions/upload-artifact@v4
+          with:
+            name: nikto-report
+            path: nikto_report.txt
 
-    - name: Cleanup Docker container
-      run: docker rm -f cyberguard-test
+        - name: Cleanup Docker container
+          run: docker rm -f cyberguard-test
