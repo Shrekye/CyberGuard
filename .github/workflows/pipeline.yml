@@ -68,8 +68,11 @@ jobs:
       - name: raport en json
         run: bandit -r . -f json -o bandit-report.json     
 
-      - name: export artifact 
-        uses: actions/upload-artifacct
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: bandit-report.json
 
   pip-audit:
     name: pip-audit security scan
