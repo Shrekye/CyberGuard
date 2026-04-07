@@ -103,7 +103,7 @@ jobs:
           ref: develop
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35
         with:
           scan-type: fs
           format: table
@@ -130,7 +130,7 @@ jobs:
             -t docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c .
 
       - name: Run Trivy image scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.35
         with:
           image-ref: docker.io/shrekye75/shrekye-project:4121c4ca19a0dd0465ca7a20f74dc7679788a98120f99485daf8bb18ccec0a6c
           format: table
