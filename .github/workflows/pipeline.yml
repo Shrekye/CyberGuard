@@ -46,7 +46,7 @@ jobs:
           echo "exclude = .git,__pycache__,venv,env" >> .flake8
 
       - name: Run flake8
-        run: flake8 . || true  # ne bloque pas le pipeline sur lint
+        run: flake8 .
 
   bandit-scan:
     name: SAST Bandit
@@ -228,7 +228,7 @@ jobs:
         run: |
           TARGET="http://localhost:5000"
           echo "Scanning target: $TARGET"
-          nikto -h $TARGET -output nikto_report.txt || true
+          nikto -h $TARGET -output nikto_report.txt
           echo "=== Nikto scan completed ==="
 
       - name: Display Nikto report
