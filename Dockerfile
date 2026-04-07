@@ -8,23 +8,23 @@ RUN apt-get update && \
         python3-dev \
         && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /install/
-WORKDIR /install
-RUN pip install --target=. --no-cache-dir -r requirements.txt
-
-COPY . /app
+COPY requirements.txt /app/
+WORKDIR /app
+RUN pip install --target=/packages --no-cache-dir -r requirements.txt
 
 FROM gcr.io/distroless/python3-debian12:nonroot
 
-COPY --from=builder /install /usr/local/lib/python3.11/site-packages/
-COPY --from=builder /app /app
+COPY --from=builder /packages /usr/lib/python3.11/site-packages/
+
+COPY --chown=nonroot:nonroot . /app
 
 WORKDIR /app
 
-ENV PYTHONPATH=/usr/local/lib/python3.11/site-packages
+ENV PYTHONPATH=/usr/lib/python3.11/site-packages
+ENV PYTHONUNBUFFERED=1
 
 USER nonroot
 
 EXPOSE 5000
 
-CMD ["/usr/bin/python3.11", "run.py"]
+CMD ["python3", "run.py"]
