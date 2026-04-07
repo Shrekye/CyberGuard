@@ -95,6 +95,7 @@ jobs:
   trivy-unprebuild:
     name: Trivy Scan PreBuild
     runs-on: ubuntu-24.04
+    needs: pip-audit
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -135,3 +136,34 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
           severity: CRITICAL,HIGH
+  
+  dast-nikto:
+    name: DAST Nikto Scan
+    runs-on: ubuntu-24.04
+    needs: trivy-postbuild
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and run Docker container
+        run: |
+          docker build -t cyberguard:${{ github.sha }} .
+          docker run -d -p 5000:5000 --name cyberguard-test cyberguard:${{ github.sha }}
+          sleep 10
+
+      - name: Install Nikto
+        run: sudo apt-get update && sudo apt-get install -y nikto
+
+      - name: Run Nikto scan
+        run: nikto -h http://host.docker.internal:5000 -output nikto_report.txt
+
+      - name: Upload Nikto report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nikto-report
+          path: nikto_report.txt
+      
+      - name: Cleanup Docker container
+        run: |
+          docker stop cyberguard-test
+          docker rm cyberguard-test
