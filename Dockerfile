@@ -17,7 +17,6 @@ COPY . /app
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 COPY --from=builder /install /usr/local/lib/python3.11/site-packages/
-
 COPY --from=builder /app /app
 
 WORKDIR /app
@@ -28,4 +27,4 @@ USER nonroot
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+CMD ["/usr/bin/python3.11", "run.py"]
