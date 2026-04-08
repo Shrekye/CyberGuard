@@ -1,16 +1,16 @@
-import os
 from flask import Blueprint, render_template, request, redirect, url_for, session, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
-from authlib.integrations.flask_client import OAuth
 from . import db
 from . import google
 import secrets
 import time
 import re
 
+
 main_bp = Blueprint("main", __name__)
+
 
 # =========================
 # CSRF PROTECTION
@@ -21,6 +21,7 @@ def generate_csrf_token():
         session["_csrf_token"] = secrets.token_hex(32)
     return session["_csrf_token"]
 
+
 def validate_csrf():
     token = session.get("_csrf_token")
     form_token = request.form.get("csrf_token")
@@ -28,9 +29,11 @@ def validate_csrf():
     if not token or not form_token or token != form_token:
         abort(403, "CSRF token validation failed")
 
+
 @main_bp.app_context_processor
 def inject_csrf():
     return dict(csrf_token=generate_csrf_token())
+
 
 # =========================
 # VALIDATION HELPERS
@@ -42,11 +45,13 @@ def validate_username(username):
         return False
     return bool(re.match(r'^[a-zA-Z0-9_-]+$', username))
 
+
 def validate_password(password):
     """Valide la force du mot de passe"""
     if not password or len(password) < 8:
         return False
     return bool(re.search(r'[A-Za-z]', password) and re.search(r'[0-9]', password))
+
 
 # =========================
 # HOME
@@ -58,11 +63,12 @@ def index():
     blue_topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).limit(10).all()
     purple_topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).limit(10).all()
     return render_template(
-        "index.html", 
-        red_topics=red_topics, 
-        blue_topics=blue_topics, 
+        "index.html",
+        red_topics=red_topics,
+        blue_topics=blue_topics,
         purple_topics=purple_topics
     )
+
 
 # =========================
 # REGISTER
@@ -78,7 +84,7 @@ def register():
 
         if not validate_username(username):
             return "Invalid username format (3-50 chars, alphanumeric, underscore, dash)", 400
-        
+
         if not validate_password(password):
             return "Password must be at least 8 characters with letters and numbers", 400
 
@@ -86,9 +92,9 @@ def register():
             return "Username already exists!", 400
 
         time.sleep(0.5)
-        
+
         user = User(
-            username=username, 
+            username=username,
             password=generate_password_hash(password, method='pbkdf2:sha256')
         )
 
@@ -98,6 +104,7 @@ def register():
         return redirect(url_for("main.login"))
 
     return render_template("register.html")
+
 
 # =========================
 # LOGIN
@@ -110,17 +117,18 @@ def login():
         password = request.form.get("password", "")
 
         time.sleep(0.5)
-        
+
         user = User.query.filter_by(username=username).first()
-        
+
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
             session.permanent = True
             return redirect(url_for("main.index"))
-            
+
         return "Invalid credentials", 401
-        
+
     return render_template("login.html")
+
 
 # =========================
 # GOOGLE OAUTH
@@ -130,6 +138,7 @@ def login():
 def google_login():
     redirect_uri = url_for('main.google_authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
+
 
 @main_bp.route('/google/auth')
 def google_authorize():
@@ -143,9 +152,9 @@ def google_authorize():
 
             if not user:
                 user = User(
-                    username=email, 
+                    username=email,
                     password=generate_password_hash(secrets.token_urlsafe(32))
-                ) 
+                )
                 db.session.add(user)
                 db.session.commit()
 
@@ -157,16 +166,17 @@ def google_authorize():
 
     return redirect(url_for('main.index'))
 
+
 # =========================
 # LOGOUT
 # =========================
 
-@main_bp.route("/logout")
+@main_bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()
-    session.clear()
     return redirect(url_for("main.index"))
+
 
 # =========================
 # CREATE TOPIC
@@ -184,15 +194,15 @@ def create_topic():
 
         if not title or len(title) < 3 or len(title) > 200:
             return "Title must be between 3 and 200 characters", 400
-            
+
         if len(content) > 10000:
             return "Content too long (max 10000 chars)", 400
-            
+
         if category not in ["red", "blue", "purple"]:
             return "Invalid category", 400
 
         time.sleep(0.3)
-        
+
         if category == "red":
             topic = RedTopic(title=title, user_id=current_user.id)
         elif category == "blue":
@@ -217,6 +227,7 @@ def create_topic():
 
     return render_template("create_topic.html")
 
+
 # =========================
 # VIEW TOPIC
 # =========================
@@ -240,12 +251,12 @@ def topic_view(category, topic_id):
 
         if not content:
             return "Content cannot be empty", 400
-            
+
         if len(content) > 5000:
             return "Content too long (max 5000 chars)", 400
 
         time.sleep(0.3)
-        
+
         post = Post(
             content=content,
             user_id=current_user.id,
@@ -263,6 +274,7 @@ def topic_view(category, topic_id):
     ).order_by(Post.created_at.asc()).all()
 
     return render_template("topic.html", topic=topic, posts=posts, category=category)
+
 
 # =========================
 # CATEGORY

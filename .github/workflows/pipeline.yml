@@ -1,5 +1,8 @@
 name: CI Pipeline
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches:
@@ -46,7 +49,7 @@ jobs:
           echo "exclude = .git,__pycache__,venv,env" >> .flake8
 
       - name: Run flake8
-        run: flake8 . || true  # ne bloque pas le pipeline sur lint
+        run: flake8 .
 
   bandit-scan:
     name: SAST Bandit
@@ -116,13 +119,12 @@ jobs:
       - name: Run Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          scan-type: fs
-          format: table
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          path: .
+          severity: 'CRITICAL,HIGH'
 
   trivy-postbuild:
     name: Trivy Scan PostBuild Docker Image
@@ -139,17 +141,17 @@ jobs:
       - name: Run Trivy image scan
         uses: aquasecurity/trivy-action@0.35.0
         with:
-          image-ref: cyberguard-local:${{ github.sha }}
-          format: table
+          image-ref: 'cyberguard-local:${{ github.sha }}'
+          format: 'table'
+          scan-type: 'image'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
+          severity: 'CRITICAL,HIGH'
   
   dast_nikto:
     name: DAST Nikto Scan
     runs-on: ubuntu-24.04
-#    needs: trivy-postbuild
+    needs: trivy-postbuild
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -195,7 +197,7 @@ jobs:
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/ 2>/dev/null || echo "000")
             
             if [ "$HTTP_CODE" != "000" ]; then
-              echo "App is responding (HTTP $HTTP_CODE)!"
+              echo " App is responding (HTTP $HTTP_CODE)!"
               echo "APP_ENDPOINT=localhost" >> $GITHUB_ENV
               exit 0
             fi
@@ -211,7 +213,7 @@ jobs:
             sleep 2
           done
           
-          echo "App failed to respond after $MAX_ATTEMPTS attempts"
+          echo " App failed to respond after $MAX_ATTEMPTS attempts"
           echo "=== Final container logs ==="
           docker logs cyberguard-test 2>&1 || true
           exit 1
@@ -228,7 +230,7 @@ jobs:
         run: |
           TARGET="http://localhost:5000"
           echo "Scanning target: $TARGET"
-          nikto -h $TARGET -output nikto_report.txt || true
+          nikto -h $TARGET -output nikto_report.txt
           echo "=== Nikto scan completed ==="
 
       - name: Display Nikto report
@@ -272,14 +274,36 @@ jobs:
             --name cyberguard-test \
             -p 5000:5000 \
             cyberguard:${{ github.sha }}
-          sleep 5
+          sleep 10
 
-      - name: ZAP Baseline Scan
+      - name: Create reports directory with proper permissions
+        run: |
+          mkdir -p zap_reports
+          chmod 777 zap_reports
+          cd zap_reports
+          touch report_json.json report_md.md report_html.html
+          chmod 666 report_json.json report_md.md report_html.html
+          cd ..
+
+      - name: ZAP Baseline Scan (sans automation)
         uses: zaproxy/action-baseline@v0.12.0
         with:
-          target: 'http://127.0.0.1:5000'
-          cmd_options: '-a'
+          target: 'http://localhost:5000'
+          cmd_options: '-r report_html.html'
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-scan-reports
+          path: |
+            report_html.html
+            *.json
+            *.md
+          if-no-files-found: ignore
 
       - name: Cleanup Docker container
         if: always()
         run: docker rm -f cyberguard-test
+
+# 3min of pipeline execution time

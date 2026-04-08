@@ -38,17 +38,18 @@
             <a href="{{ url_for('main.create_topic') }}">New Topic</a>
 
             {% if current_user.is_authenticated %}
-            <span>Hi, {{ current_user.username }}</span>
-            <a href="{{ url_for('main.logout') }}">
-                <button class="btnLogout">Log out</button>
-            </a>
+                <span>Hi, {{ current_user.username }}</span>
+                <form action="{{ url_for('main.logout') }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btnLogout">Log out</button>
+                </form>
             {% else %}
-            <a href="{{ url_for('main.register') }}">
-                <button class="btnRegistre">Registre</button>
-
-            <a href="{{ url_for('main.login') }}">
-                 <button class="btnlogin">Login</button>
-            </a>
+                <a href="{{ url_for('main.register') }}">
+                    <button class="btnRegistre">Register</button>
+                </a>
+                <a href="{{ url_for('main.login') }}">
+                    <button class="btnlogin">Login</button>
+                </a>
             {% endif %}
         </nav>
     </header>
