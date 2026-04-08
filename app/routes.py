@@ -179,6 +179,15 @@ def logout():
 
 
 # =========================
+# SECRET
+# =========================
+
+@main_bp.route("/secret")
+def secret():
+    return render_template("secret.html")
+
+
+# =========================
 # CREATE TOPIC
 # =========================
 
