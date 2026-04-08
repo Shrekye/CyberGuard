@@ -78,7 +78,9 @@ def create_app():
         # Google OAuth scripts
         "script-src": [
             "'self'",
-            "https://accounts.google.com"
+            "'unsafe-inline'",
+            "https://accounts.google.com",
+            "https://apis.google.com"
         ],
 
         # inline css souvent utilisé par templates
@@ -86,6 +88,8 @@ def create_app():
             "'self'",
             "'unsafe-inline'"
         ],
+
+        "media-src": ["'self'"],
 
         # avatars google
         "img-src": [

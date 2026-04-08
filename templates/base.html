@@ -21,7 +21,7 @@
 
         <nav class="link-nav ">
             <audio id="audio" loop>
-                <source src="{{ url_for('static', filename='cyberpunk.mp3')}}" type="audio/mpeg">
+                <source src="{{ url_for('static', filename='cyberpunk.mp3', mimetype="audio")}}" type="audio/mpeg">
             </audio>
 
             <button onclick="toggleMusic()" class="btn-music">
