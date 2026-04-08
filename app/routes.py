@@ -171,11 +171,10 @@ def google_authorize():
 # LOGOUT
 # =========================
 
-@main_bp.route("/logout")
+@main_bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()
-    session.clear()
     return redirect(url_for("main.index"))
 
 
