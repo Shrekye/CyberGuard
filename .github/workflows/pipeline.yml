@@ -287,15 +287,15 @@ jobs:
               cyberguard:${{ github.sha }}
             sleep 10
 
-      - name: Create reports directory with proper permissions
-        run: |
-          sudo chmod -R 777
-          mkdir -p zap_reports
-          chmod 777 zap_reports
-          cd zap_reports
-          touch report_json.json report_md.md report_html.html
-          chmod 666 report_json.json report_md.md report_html.html
-          cd ..
+        - name: Create reports directory with proper permissions
+          run: |
+            sudo chmod -R 777
+            mkdir -p zap_reports
+            chmod 777 zap_reports
+            cd zap_reports
+            touch report_json.json report_md.md report_html.html
+            chmod 666 report_json.json report_md.md report_html.html
+            cd ..
 
         - name: ZAP Baseline Scan
           uses: zaproxy/action-baseline@v0.12.0
