@@ -259,7 +259,7 @@ jobs:
   dast-zap:
     name: OWASP ZAP Scan
     runs-on: ubuntu-24.04
-    needs: trivy-postbuild
+    #needs: trivy-postbuild
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
