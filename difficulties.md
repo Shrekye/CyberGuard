@@ -143,6 +143,8 @@ RUN apt-get update && \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN openssl version                                     # Check de la version de OpenSSL
+
 COPY requirements.txt .
 RUN pip install --target=/packages --no-cache-dir -r requirements.txt
 COPY . /app
@@ -188,32 +190,12 @@ Ajout d'un fichier .trivyignore dans le pipeline pour ignorer ce faux positif.
         uses: actions/checkout@v4
 
       - name: Build Docker image locally
-        run: |
-          docker build -t cyberguard-local:${{ github.sha }} .
-
-      - name: Verify OpenSSL version
-        run: |
-          OPENSSL_VERSION=$(docker run --rm cyberguard-local:${{ github.sha }} openssl version 2>/dev/null || echo "unknown")
-          echo "OpenSSL version: $OPENSSL_VERSION"
-          
-          # Vérifier que la version est sécurisée (≥ 3.0.19)
-          if echo "$OPENSSL_VERSION" | grep -qE "OpenSSL 3\.[0-9]+\.[0-9]+"; then
-            VERSION_NUM=$(echo "$OPENSSL_VERSION" | sed -n 's/OpenSSL \([0-9]\+\.[0-9]\+\.[0-9]\+\) .*/\1/p')
-            if [ "$(printf '%s\n' "3.0.19" "$VERSION_NUM" | sort -V | head -n1)" = "3.0.19" ]; then
-              echo "✅ OpenSSL version $VERSION_NUM is secure (>= 3.0.19)"
-            else
-              echo "⚠️ OpenSSL version $VERSION_NUM might be vulnerable"
-            fi
-          else
-            echo "⚠️ Could not determine OpenSSL version"
-          fi
+        run: docker build -t cyberguard-local:${{ github.sha }} .
 
       - name: Create Trivy ignore file
         run: |
           cat > .trivyignore << 'EOF'
-          # CVE-2026-28390 - False positive: OpenSSL version is actually 3.5.5 which includes the fix
-          # Reference: https://security-tracker.debian.org/tracker/CVE-2026-28390
-          # Fixed in OpenSSL 3.0.19+, current version is 3.5.5
+          # CVE-2026-28390 - False positive: OpenSSL 3.5.5 includes the fix
           CVE-2026-28390
           EOF
 
@@ -222,20 +204,10 @@ Ajout d'un fichier .trivyignore dans le pipeline pour ignorer ce faux positif.
         with:
           image-ref: 'cyberguard-local:${{ github.sha }}'
           format: 'table'
-          scan-type: 'image'
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
           trivyignores: .trivyignore
-
-      - name: Upload Trivy results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-results
-          path: |
-            trivy-results.txt
-            .trivyignore
 ```
 
 ## Résultat
