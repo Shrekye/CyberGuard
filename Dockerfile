@@ -1,13 +1,13 @@
 FROM python:3.11-slim AS builder
 
-
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         build-essential \
         libffi-dev \
         libssl-dev \
         python3-dev \
-        && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --target=/packages --no-cache-dir -r requirements.txt
