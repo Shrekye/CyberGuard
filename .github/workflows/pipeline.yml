@@ -289,7 +289,7 @@ jobs:
 
         - name: Create reports directory with proper permissions
           run: |
-            sudo chmod -R 777 .
+            chmod -R 777 .
             mkdir -p zap_reports
             chmod 777 zap_reports
             cd zap_reports
