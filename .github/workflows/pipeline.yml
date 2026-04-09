@@ -302,16 +302,15 @@ jobs:
           with:
             target: 'http://localhost:5000'
             token: ${{ secrets.GITHUB_TOKEN }}
-            cmd_options: '-r report_html.html'
+            cmd_options: '-r report-html.html'
 
         - name: Upload ZAP reports
           if: always()
           uses: actions/upload-artifact@v4
           with:
             name: zap-scan-reports
-            token: ${{ secrets.GITHUB_TOKEN }}
             path: |
-              report_html.html
+              report-html.html
               *.json
               *.md
             if-no-files-found: ignore
