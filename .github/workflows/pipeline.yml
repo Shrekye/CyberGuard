@@ -290,8 +290,8 @@ jobs:
         - name: Create reports directory with proper permissions
           run: |
             sudo chmod -R 777 .
-            mkdir -p zap_reports
-            sudo chmod 777 zap_reports
+            mkdir -p zap-reports
+            sudo chmod 777 zap-reports
             cd zap_reports
             touch report_json.json report_md.md report_html.html
             sudo chmod 666 report_json.json report_md.md report_html.html
