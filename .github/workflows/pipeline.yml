@@ -303,7 +303,7 @@ jobs:
             target: 'http://localhost:5000'
             token: ${{ secrets.GITHUB_TOKEN }}
             artifact_name: 'zap_results_internal'
-            cmd_options: '-r report-html.html'
+            cmd_options: '-r report_html.html -J report_json.json -w report_md.md'
 
         - name: Upload ZAP reports
           if: always()
