@@ -290,8 +290,8 @@ jobs:
         - name: Create reports directory with proper permissions
           run: |
             sudo chmod -R 777 .
-            mkdir -p zap-reports
-            sudo chmod 777 zap-reports
+            mkdir -p zap_reports
+            sudo chmod 777 zap_reports
             cd zap_reports
             touch report_json.json report_md.md report_html.html
             sudo chmod 666 report_json.json report_md.md report_html.html
@@ -302,8 +302,7 @@ jobs:
           with:
             target: 'http://localhost:5000'
             token: ${{ secrets.GITHUB_TOKEN }}
-            artifact_name: 'zap_results_internal'
-            cmd_options: '-r report_html.html -J report_json.json -w report_md.md'
+            cmd_options: '-r report-html.html'
 
         - name: Upload ZAP reports
           if: always()
