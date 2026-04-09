@@ -9,6 +9,8 @@ RUN apt-get update && \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN openssl version
+
 COPY requirements.txt .
 RUN pip install --target=/packages --no-cache-dir -r requirements.txt
 COPY . /app
