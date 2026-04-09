@@ -137,12 +137,12 @@ jobs:
       - name: Build Docker image locally
         run: docker build -t cyberguard-local:${{ github.sha }} .
 
-      - name: Create Trivy ignore file
-        run: |
-          cat > .trivyignore << 'EOF'
-          # CVE-2026-28390 - False positive: OpenSSL 3.5.5 includes the fix
-          CVE-2026-28390
-          EOF
+#      - name: Create Trivy ignore file
+#        run: |
+#          cat > .trivyignore << 'EOF'
+#          # CVE-2026-28390 - False positive: OpenSSL 3.5.5 includes the fix
+#          CVE-2026-28390
+#          EOF
 
       - name: Run Trivy image scan
         uses: aquasecurity/trivy-action@0.35.0
@@ -152,7 +152,7 @@ jobs:
           exit-code: '1'
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
-          trivyignores: .trivyignore
+#          trivyignores: .trivyignore
   
   dast_nikto:
     name: DAST Nikto Scan

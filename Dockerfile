@@ -18,7 +18,13 @@ COPY . /app
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 WORKDIR /app
+
 COPY --from=builder /packages /usr/lib/python3.11/site-packages/
+
+COPY --from=builder /usr/bin/openssl /usr/bin/openssl
+COPY --from=builder /usr/lib/ssl /usr/lib/ssl
+COPY --from=builder /usr/include/openssl /usr/include/openssl
+
 COPY --from=builder --chown=nonroot:nonroot /app /app
 
 ENV PYTHONPATH=/usr/lib/python3.11/site-packages
