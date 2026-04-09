@@ -291,10 +291,10 @@ jobs:
           run: |
             sudo chmod -R 777 .
             mkdir -p zap_reports
-            chmod 777 zap_reports
+            sudo chmod 777 zap_reports
             cd zap_reports
             touch report_json.json report_md.md report_html.html
-            chmod 666 report_json.json report_md.md report_html.html
+            sudo chmod 666 report_json.json report_md.md report_html.html
             cd ..
 
         - name: ZAP Baseline Scan
