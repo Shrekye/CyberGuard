@@ -402,7 +402,7 @@ jobs:
     
   dast-Wapiti:
       name: Wapiti scan
-      runs-on: ubuntu-24.04
+      runs-on:  ubuntu-24.04
       needs: OWASP ZAP Scan
       
       permissions:
