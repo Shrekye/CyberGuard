@@ -16,42 +16,43 @@ on:
 jobs:
 
   gitleaks:
-      name: Gitleaks Scan
-      runs-on: ubuntu-24.04
-      permissions:
-        security-events: write
-        contents: read
+    name: Gitleaks Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+      contents: read
 
-      steps:
-        - name: Checkout repo
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        - name: Install Gitleaks
-          run: |
-            curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar xz
-            sudo mv gitleaks /usr/local/bin/
+      - name: Install Gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar xz
+          sudo mv gitleaks /usr/local/bin/
+          gitleaks version
 
-        - name: Run Gitleaks
-          run: |
-            gitleaks detect \
-              --source . \
-              --verbose \
-              --exit-code=2 \
-              --log-level=debug \
-              --redact \
-              --report-format=sarif \
-              --report-path=gitleaks.sarif
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          continue-on-error: true
+      - name: Run Gitleaks
+        run: |
+          gitleaks detect \
+            --source . \
+            --verbose \
+            --exit-code=2 \
+            --log-level=debug \
+            --redact \
+            --report-format=sarif \
+            --report-path=gitleaks.sarif
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
-        - name: Upload SARIF file
-          if: always()
-          uses: github/codeql-action/upload-sarif@v4
-          with:
-            sarif_file: gitleaks.sarif
+      - name: Upload SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: gitleaks.sarif
 
   trufflehog:
     name: TruffleHog Scan
