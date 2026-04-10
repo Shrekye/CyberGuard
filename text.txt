@@ -1,0 +1,16 @@
+# ======================
+# FAKE KEYS FOR TESTING (SAFE FOR CI)
+# ======================
+
+AWS_ACCESS_KEY_ID=TEST_AWS_KEY_123456789
+AWS_SECRET_ACCESS_KEY=not_a_real_secret_value
+
+STRIPE_SECRET_KEY=test_stripe_secret_key_123
+SLACK_WEBHOOK=https://example.com/slack/test
+
+GITHUB_TOKEN=test_github_token_123
+GITHUB_PAT=test_pat_value_123
+
+api_key="fake_api_key_123456"
+
+password="not_a_real_password"
