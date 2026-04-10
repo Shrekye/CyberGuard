@@ -23,36 +23,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks (inline rules)
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: >
-            detect
-            --verbose
+      - name: Run Gitleaks (inline config fixed)
+        run: |
+          gitleaks detect \
+            --verbose \
+            --exit-code=2 \
             --config-inline '
-            title = "inline-config"
+          title = "inline-config"
 
-            [extend]
-            useDefault = true
+          [extend]
+          useDefault = true
 
-            [[rules]]
-            id = "fake-api-key-lab"
-            description = "Detect fake API keys"
-            regex = '''fake_api_key_[0-9]{6,}'''
-            tags = ["test"]
+          [[rules]]
+          id = "fake-api-key-lab"
+          description = "Detect fake API keys"
+          regex = "fake_api_key_[0-9]{6,}"
 
-            [[rules]]
-            id = "aws-test-key"
-            description = "Detect AWS test keys"
-            regex = '''AKIA_TEST_[A-Z0-9]{6,}'''
-            tags = ["aws"]
+          [[rules]]
+          id = "aws-test-key"
+          description = "Detect AWS test keys"
+          regex = "AKIA_TEST_[A-Z0-9]{6,}"
 
-            [[rules]]
-            id = "github-test-token"
-            description = "Detect GitHub test tokens"
-            regex = '''ghp_test[a-zA-Z0-9]{10,}'''
-            tags = ["github"]
-            '
+          [[rules]]
+          id = "github-test-token"
+          description = "Detect GitHub test tokens"
+          regex = "ghp_test[a-zA-Z0-9]{10,}"
+          '
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
