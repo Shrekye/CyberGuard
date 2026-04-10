@@ -399,7 +399,7 @@ jobs:
           run: |
             wapiti \
              -u http://127.0.0.1:5000 \
-             --scope floder \
+             --scope folder \
              -m sql,xss,xxe,ssrf,csrf,headers,wapp \
              --depth 3 \
              --max-scan-time 300 \
