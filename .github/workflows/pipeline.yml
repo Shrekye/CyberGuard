@@ -321,4 +321,20 @@ jobs:
           if: always()
           run: docker rm -f cyberguard-test
 
+  semgrep:
+    name: Semgrep SAST Scan
+    runs-on: ubuntu-24.04
+    needs: flake8-lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/ci
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
 # 3min of pipeline execution time
