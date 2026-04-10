@@ -45,7 +45,7 @@ jobs:
             --redact \
             --report-format=sarif \
             --report-path=gitleaks.sarif \
-            --exit-code=0 || true  # Ne pas échouer immédiatement
+            --exit-code=1
           
           # Créer un rapport vide si nécessaire
           if [ ! -f gitleaks.sarif ]; then
