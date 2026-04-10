@@ -19,78 +19,40 @@ jobs:
     name: Gitleaks Scan
     runs-on: ubuntu-24.04
     permissions:
-      security-events: write
       contents: read
+      security-events: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Gitleaks
-        run: |
-          # Télécharger et installer Gitleaks
-          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar xz
-          sudo mv gitleaks /usr/local/bin/
-          gitleaks version
-
-      - name: Run Gitleaks and generate SARIF
-        run: |
-          # Créer un fichier SARIF vide par défaut
-          cat > gitleaks.sarif << 'EOF'
-          {
-            "version": "2.1.0",
-            "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-            "runs": [
-              {
-                "tool": {
-                  "driver": {
-                    "name": "Gitleaks",
-                    "informationUri": "https://github.com/gitleaks/gitleaks",
-                    "version": "8.24.3"
-                  }
-                },
-                "results": []
-              }
-            ]
-          }
-          EOF
-          
-          # Exécuter Gitleaks et générer le rapport SARIF
-          # Note: --exit-code=0 empêche l'échec du workflow
-          gitleaks detect \
-            --source . \
-            --verbose \
-            --redact \
-            --report-format sarif \
-            --report-path gitleaks_temp.sarif \
-            --exit-code=0 || true
-          
-          # Si un rapport a été généré, l'utiliser
-          if [ -f gitleaks_temp.sarif ] && [ -s gitleaks_temp.sarif ]; then
-            echo " SARIF report generated with findings"
-            mv gitleaks_temp.sarif gitleaks.sarif
-          else
-            echo "!!! No leaks found, using empty SARIF report"
-          fi
-          
-          # Afficher la taille du fichier pour debug
-          echo "SARIF file size: $(wc -c < gitleaks.sarif) bytes"
-          
-          # Afficher le contenu si petit fichier (debug)
-          if [ $(wc -c < gitleaks.sarif) -lt 1000 ]; then
-            echo "SARIF content:"
-            cat gitleaks.sarif
-          fi
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          config-path: .gitleaks.toml
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
-          sarif_file: gitleaks.sarif
+          sarif_file: results.sarif
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚨 **Security Alert**: Secrets detected in this PR. Please remove them before merging.'
+            })
 
   trufflehog:
     name: TruffleHog Scan
@@ -344,7 +306,7 @@ jobs:
   dast-zap:
       name: OWASP ZAP Scan
       runs-on: ubuntu-24.04
-      needs: trivy-postbuild
+      #needs: trivy-postbuild
       permissions:
         contents: read
         issues: write 
@@ -373,7 +335,7 @@ jobs:
             sudo chmod 777 zap_reports
             cd zap_reports
             touch report_json.json report_md.md report_html.html
-            sudo chmod 666 report_jsojson report_md.md report_html.html
+            sudo chmod 666 report_json.json report_md.md report_html.html
             cd ..
 
         - name: ZAP Baseline Scan
