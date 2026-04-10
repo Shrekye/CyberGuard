@@ -73,6 +73,24 @@ severity = "HIGH"
 [allowlist]
 description = "Allowlisted files and paths"
 
+# Chemins à ignorer
+paths = [
+    '''\.git/''',
+    '''\.vscode/''',
+    '''\.idea/''',
+    '''node_modules/''',
+    '''venv/''',
+    '''env/''',
+    '''__pycache__/''',
+    '''dist/''',
+    '''build/''',
+    '''target/''',
+    '''\.pytest_cache/''',
+    '''\.coverage/''',
+    '''htmlcov/''',
+]
+
+# Fichiers à ignorer
 files = [
     '''\.lock$''',
     '''\.log$''',
@@ -94,22 +112,6 @@ files = [
     '''\.env\.local''',
 ]
 
-paths = [
-    '''\.git/''',
-    '''\.vscode/''',
-    '''\.idea/''',
-    '''node_modules/''',
-    '''venv/''',
-    '''env/''',
-    '''__pycache__/''',
-    '''dist/''',
-    '''build/''',
-    '''target/''',
-    '''\.pytest_cache/''',
-    '''\.coverage/''',
-    '''htmlcov/''',
-]
-
 # Commits spécifiques à ignorer (optionnel)
 commits = []
 
@@ -118,15 +120,3 @@ regexes = [
     '''[0-9a-f]{32}''',  # MD5 (souvent faux positif)
     '''[0-9a-f]{40}''',  # SHA1
 ]
-
-[[allowlist.paths]]
-path = '''test/'''
-description = "Test files often contain example secrets"
-
-[[allowlist.paths]]
-path = '''examples/'''
-description = "Example files contain demo secrets"
-
-[[allowlist.paths]]
-path = '''docs/'''
-description = "Documentation may contain examples"
