@@ -365,7 +365,7 @@ jobs:
   dast-Wapiti:
       name: Wapiti scan
       runs-on:  ubuntu-24.04
-      needs: OWASP ZAP Scan
+      needs: dast-zap
       
       permissions:
         contents: read
