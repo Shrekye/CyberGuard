@@ -135,7 +135,7 @@ Total: 1 (HIGH: 1, CRITICAL: 0)
 FROM python:3.11-slim AS builder
 
 RUN apt-get update && \
-    apt-get upgrade -y && \                             # Application des derniers patchs de sécurité
+    apt-get upgrade -y && \                                           # Application des derniers patchs de sécurité
     apt-get install -y --no-install-recommends \
         build-essential \
         libffi-dev \
@@ -143,7 +143,7 @@ RUN apt-get update && \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN openssl version                                     # Check de la version de OpenSSL
+RUN openssl version                                                   # Check de la version de OpenSSL
 
 COPY requirements.txt .
 RUN pip install --target=/packages --no-cache-dir -r requirements.txt
@@ -152,7 +152,13 @@ COPY . /app
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 WORKDIR /app
+
 COPY --from=builder /packages /usr/lib/python3.11/site-packages/
+
+COPY --from=builder /usr/bin/openssl /usr/bin/openssl                 # Récupération des packet SSL à jour
+COPY --from=builder /usr/lib/ssl /usr/lib/ssl                         # Récupération des packet SSL à jour
+COPY --from=builder /usr/include/openssl /usr/include/openssl         # Récupération des packet SSL à jour
+
 COPY --from=builder --chown=nonroot:nonroot /app /app
 
 ENV PYTHONPATH=/usr/lib/python3.11/site-packages
