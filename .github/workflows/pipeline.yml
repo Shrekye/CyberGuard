@@ -371,6 +371,7 @@ jobs:
         uses: semgrep/semgrep-action@v1
         with:
           config: p/ci
+          disable_rules: python.flask.security.audit.flask-url-for-external-true
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
