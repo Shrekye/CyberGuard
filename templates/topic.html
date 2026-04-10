@@ -5,6 +5,7 @@
 <div class="page {{ category }}">
 
 <h2 class="topic-title">{{ topic.title }}</h2>
+
 <p class="topic-info">
 Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %H:%M') }}
 </p>
@@ -15,8 +16,19 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 
 {% for post in posts %}
 <div class="post-card {{ category }}">
+
     <p class="Cpost">{{ post.content }}</p>
-    <small>By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+
+    {% if post.image %}
+        <img src="{{ url_for('static', filename='uploads/' + post.image) }}"
+             alt="Post image"
+             style="max-width:300px; margin-top:10px; border-radius:8px;">
+    {% endif %}
+
+    <small>
+        By {{ post.user.username }} at {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+    </small>
+
 </div>
 {% else %}
 <p>No posts yet.</p>
@@ -26,15 +38,27 @@ Created by {{ topic.user.username }} on {{ topic.created_at.strftime('%Y-%m-%d %
 
 {% if current_user.is_authenticated %}
 <h3>Add a Reply</h3>
+
 <form method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <textarea name="content" placeholder="Write your reply here..." required maxlength="600"></textarea><br><br>
+
+    <textarea name="content"
+              placeholder="Write your reply here..."
+              required
+              maxlength="600"></textarea>
+
+    <br><br>
+
     <button type="submit">Post Reply</button>
 </form>
+
 {% else %}
-<p><a href="{{ url_for('main.login') }}">Login</a> to post a reply.</p>
+<p>
+    <a href="{{ url_for('main.login') }}">Login</a> to post a reply.
+</p>
 {% endif %}
 
+<br>
 <a href="{{ url_for('main.index') }}">Back to Home</a>
 
 </div>
