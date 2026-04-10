@@ -14,3 +14,5 @@ GITHUB_PAT=test_pat_value_123
 api_key="fake_api_key_123456"
 
 password="not_a_real_password"
+AWS_ACCESS_KEY_ID=AKIA_TEST_1234567890
+TKN=ghp_testgithubtoken123456789

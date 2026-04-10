@@ -23,14 +23,58 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: gitleaks/gitleaks-action@v2
+      - name: Run Gitleaks (inline rules FIXED)
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: >
+            detect
+            --verbose
+            --exit-code=2
+            --config-inline $'
+            title = "inline-config"
+
+            [extend]
+            useDefault = true
+
+            [[rules]]
+            id = "fake-api-key-lab"
+            description = "Detect fake API keys"
+            regex = "fake_api_key_[0-9]{6,}"
+            tags = ["test"]
+
+            [[rules]]
+            id = "aws-test-key"
+            description = "Detect AWS test keys"
+            regex = "AKIA_TEST_[A-Z0-9]{6,}"
+            tags = ["aws"]
+
+            [[rules]]
+            id = "github-test-token"
+            description = "Detect GitHub test tokens"
+            regex = "ghp_test[a-zA-Z0-9]{10,}"
+            tags = ["github"]
+            '
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trufflehog:
+    name: TruffleHog Scan
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: .
 
   flake8-lint:
     name: Flake8 Lint
     runs-on: ubuntu-24.04
-    needs: gitleaks
+    needs: [gitleaks, trufflehog]
     steps:
       - uses: actions/checkout@v4
 
