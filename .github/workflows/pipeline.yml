@@ -29,23 +29,24 @@ jobs:
             fetch-depth: 0
 
         - name: Run Gitleaks
-          uses: gitleaks/gitleaks-action@v2
+          uses: gitleaks/gitleaks-action@v2.3.0
           with:
-            args: >
-              detect
+            version: 8.24.3
+            config: .gitleaks.toml
+            detect: |
               --verbose
               --exit-code=2
               --source .
               --log-level=debug
-              --redact  # Redacts secrets in output
-              --report-format sarif
-              --report-path gitleaks.sarif
+              --redact
+              --report-format=sarif
+              --report-path=gitleaks.sarif
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Upload SARIF file
           if: always()
-          uses: github/codeql-action/upload-sarif@v3
+          uses: github/codeql-action/upload-sarif@v4
           with:
             sarif_file: gitleaks.sarif
 
