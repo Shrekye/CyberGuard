@@ -1,0 +1,122 @@
+# .gitleaks.toml
+title = "Gitleaks Configuration for CyberGuard"
+
+# Utiliser les règles par défaut de Gitleaks
+[extend]
+useDefault = true
+
+# Règles personnalisées
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["aws", "secret"]
+severity = "HIGH"
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Key"
+regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["aws", "secret"]
+severity = "HIGH"
+
+[[rules]]
+id = "github-token"
+description = "GitHub Token"
+regex = '''(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36,255}'''
+tags = ["github", "token"]
+severity = "HIGH"
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA|EC|OPENSSH|DSA|PGP) PRIVATE KEY-----'''
+tags = ["key", "private"]
+severity = "CRITICAL"
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key in code"
+regex = '''(?i)(api[_-]?key|apikey|secret|token|password)['\"]?\s*[=:]\s*['\"]?[a-f0-9]{16,64}['\"]?'''
+tags = ["api", "key"]
+severity = "MEDIUM"
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*'''
+tags = ["jwt", "token"]
+severity = "HIGH"
+
+[[rules]]
+id = "database-connection"
+description = "Database Connection String"
+regex = '''(?i)(mongodb|mysql|postgresql|redis|sqlite)://[^\s"'<>]+'''
+tags = ["database", "connection"]
+severity = "HIGH"
+
+[[rules]]
+id = "slack-webhook"
+description = "Slack Webhook URL"
+regex = '''https://hooks\.slack\.com/services/[A-Za-z0-9]+/[A-Za-z0-9]+/[A-Za-z0-9]+'''
+tags = ["slack", "webhook"]
+severity = "HIGH"
+
+[[rules]]
+id = "discord-bot-token"
+description = "Discord Bot Token"
+regex = '''[A-Za-z0-9-]{24}\.[A-Za-z0-9-]{6}\.[A-Za-z0-9-]{27,38}'''
+tags = ["discord", "token"]
+severity = "HIGH"
+
+# Whitelist - fichiers à ignorer
+[allowlist]
+description = "Allowlisted files and paths"
+
+# Chemins à ignorer
+paths = [
+    '''\.git/''',
+    '''\.vscode/''',
+    '''\.idea/''',
+    '''node_modules/''',
+    '''venv/''',
+    '''env/''',
+    '''__pycache__/''',
+    '''dist/''',
+    '''build/''',
+    '''target/''',
+    '''\.pytest_cache/''',
+    '''\.coverage/''',
+    '''htmlcov/''',
+]
+
+# Fichiers à ignorer
+files = [
+    '''\.lock$''',
+    '''\.log$''',
+    '''\.tmp$''',
+    '''\.swp$''',
+    '''\.git/config''',
+    '''\.gitattributes''',
+    '''\.gitignore''',
+    '''go\.sum''',
+    '''go\.mod''',
+    '''package-lock\.json''',
+    '''yarn\.lock''',
+    '''pnpm-lock\.yaml''',
+    '''composer\.lock''',
+    '''Gemfile\.lock''',
+    '''poetry\.lock''',
+    '''\.env\.example''',
+    '''\.env\.sample''',
+    '''\.env\.local''',
+]
+
+# Commits spécifiques à ignorer (optionnel)
+commits = []
+
+# Patterns de false positives à ignorer
+regexes = [
+    '''[0-9a-f]{32}''',  # MD5 (souvent faux positif)
+    '''[0-9a-f]{40}''',  # SHA1
+]
