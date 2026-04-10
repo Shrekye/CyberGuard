@@ -35,17 +35,6 @@ jobs:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
         with:
           config-path: .gitleaks.toml
-          args: >
-                    detect
-                    --source .
-                    --verbose
-                    --redact
-                    --exit-code=2
-                    --report-format sarif
-                    --report-path results.sarif
-                    --log-level debug
-                    --log-opts="--all"
-
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
