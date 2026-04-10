@@ -361,6 +361,62 @@ jobs:
         - name: Cleanup Docker container
           if: always()
           run: docker rm -f cyberguard-test
+    
+  dast-Wapiti:
+      name: Wapiti scan
+      runs-on: ubuntu-24.04
+      needs: OWASP ZAP Scan
+      
+      permissions:
+        contents: read
+        issues: write
+        pull-requests: write
+
+      steps:
+        - name: checkout code
+          uses: actions/checkout@v4
+        - name: build Docker image
+          run : docker build -t cyberguard:${{ github.sha }} .
+        
+        - name: Run application
+          run: |
+            docker run -d \
+              --name cyberguard-test \
+              -p 5000:5000 \
+              cyberguard:${{ github.sha }}
+            sleep 5 
+        - name: Set up python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.12"
+        
+        - name: Install wapiti
+          run: pip install wapiti3
+
+        - name: Prepare report
+          run: mkdir -p report-wapiti
+        
+        - name: Run Wapiti
+          run: |
+            wapiti \
+             -u http://127.0.0.1:5000 \
+             -- scop floder \
+             -m sql,xss,xxe,ssrf,csrf,headers,wapp \
+             --depth 3 \
+             --max-scan-time 300 \
+             -v 1 
+             -f html -o wapiti-reports/report.html \
+             -f json -o wapiti-reports/report.json
+        - name: upload Artifact
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: wapiti-scan-reports
+            path: wapi-reports/ 
+        
+        - name: clean Docker
+          if: always()
+          run: docker rm -f cyberguard-test
 
   semgrep:
     name: Semgrep SAST Scan
