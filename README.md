@@ -208,6 +208,13 @@ Le projet intègre une pipeline de sécurité automatisée.
 - correction des rapports ZAP
 - optimisation du frontend
 
+## Difficultés rencontrées
+
+Des exemples de difficultés rencontrées lors des différentes phases de développement du projet sont renseignés dans les fichiers suivants :
+
+- `difficulties.md`
+- ...
+
 ---
 
 ## Licence
