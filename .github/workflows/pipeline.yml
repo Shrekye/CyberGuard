@@ -421,7 +421,7 @@ jobs:
   semgrep:
     name: Semgrep SAST Scan
     runs-on: ubuntu-24.04
-    #needs: flake8-lint
+    needs: flake8-lint
 
     steps:
       - name: Checkout code
@@ -431,7 +431,6 @@ jobs:
         uses: semgrep/semgrep-action@v1
         with:
           config: p/ci
-          disable_rules: python.flask.security.audit.flask-url-for-external-true
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
 
