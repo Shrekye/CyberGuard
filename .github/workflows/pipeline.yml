@@ -325,7 +325,7 @@ jobs:
             docker run -d \
               --name cyberguard-test \
               -p 5000:5000 \
-              cyberguard:${{ github.sha }}
+              cyberguard:${{ github.sha }} .
             sleep 2
 
         - name: Create reports directory with proper permissions
