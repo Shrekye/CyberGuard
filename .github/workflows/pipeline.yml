@@ -360,7 +360,7 @@ jobs:
   semgrep:
     name: Semgrep SAST Scan
     runs-on: ubuntu-24.04
-    needs: flake8-lint
+    #needs: flake8-lint
 
     steps:
       - name: Checkout code
