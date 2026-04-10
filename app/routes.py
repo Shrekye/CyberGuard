@@ -317,12 +317,12 @@ def topic_view(category, topic_id):
         topic_type=category
     ).order_by(Post.created_at.asc()).all()
 
-
     return render_template("topic.html", topic=topic, posts=posts, category=category)
 
 # =========================
 # CATEGORY
 # =========================
+
 
 @main_bp.route("/category/<category>")
 def category_view(category):
