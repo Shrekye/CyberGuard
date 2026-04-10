@@ -31,7 +31,7 @@ jobs:
             detect
             --verbose
             --exit-code=2
-            --config .gitleaks.toml
+            --source .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
