@@ -2,6 +2,7 @@ from datetime import datetime
 from . import db
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
@@ -41,4 +42,3 @@ class Post(db.Model):
     topic_type = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     image = db.Column(db.String(255), nullable=True)
-    
