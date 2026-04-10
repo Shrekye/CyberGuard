@@ -148,7 +148,10 @@ def login():
 
 @main_bp.route('/login/google')
 def google_login():
-    redirect_uri = url_for('main.google_authorize', _external=True)
+    redirect_uri = url_for(
+    'main.google_authorize',
+    _external=True,
+    _scheme="https")
     return google.authorize_redirect(redirect_uri)
 
 
