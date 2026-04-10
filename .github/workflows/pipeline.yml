@@ -20,11 +20,12 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks
+      - name: Run Gitleaks (FULL SCAN FIX)
         uses: gitleaks/gitleaks-action@v2
         with:
           args: >
@@ -32,6 +33,7 @@ jobs:
             --verbose
             --exit-code=2
             --source .
+            --log-level=debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
