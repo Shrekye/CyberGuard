@@ -343,7 +343,6 @@ jobs:
           with:
             target: 'http://127.0.0.1:5000'
             artifact_name: 'zap-scan-reports'
-            rules_file_name: '.zap/rules.tsv'
             token: ${{ secrets.GITHUB_TOKEN }}
             cmd_options: '-r zap-reports/report.html'
 
