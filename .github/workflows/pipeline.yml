@@ -301,8 +301,10 @@ jobs:
           uses: zaproxy/action-baseline@v0.12.0
           with:
             target: 'http://localhost:5000'
+            artifact_name: 'zap-scan-reports'
+            rules_file_name: '.zap/rules.tsv'
             token: ${{ secrets.GITHUB_TOKEN }}
-            cmd_options: '-r report-html.html'
+            cmd_options: '-r zap-reports/report.html -J zap-reports/report.json -w zap-reports/report.md'
 
         - name: Upload ZAP reports
           if: always()
