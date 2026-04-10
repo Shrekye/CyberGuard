@@ -1,122 +1,68 @@
-title = "CyberGuard Gitleaks Rules"
+# .gitleaks.toml
+title = "Gitleaks Configuration"
 
 [extend]
+# You can extend from the default Gitleaks config
 useDefault = true
-
-# =========================
-# API KEYS
-# =========================
-
-[[rules]]
-id = "generic-api-key"
-description = "Generic API key"
-regex = '''(?i)api[_-]?key\s*[:=]\s*['"][A-Za-z0-9_\-]{16,}['"]'''
-tags = ["api", "key"]
-
-[[rules]]
-id = "long-api-token"
-description = "Long API token pattern"
-regex = '''['"][A-Za-z0-9_\-]{32,}['"]'''
-tags = ["token"]
-
-# =========================
-# PASSWORDS
-# =========================
-
-[[rules]]
-id = "hardcoded-password"
-description = "Hardcoded password"
-regex = '''(?i)password\s*[:=]\s*['"][^'"]{6,}['"]'''
-tags = ["password"]
-
-[[rules]]
-id = "db-password"
-description = "Database password"
-regex = '''(?i)(db_password|database_password)\s*[:=]\s*['"][^'"]+['"]'''
-tags = ["database"]
-
-# =========================
-# CLOUD KEYS
-# =========================
 
 [[rules]]
 id = "aws-access-key"
-description = "AWS Access Key ID"
-regex = '''AKIA[0-9A-Z]{16}'''
-tags = ["aws"]
+description = "AWS Access Key"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["aws", "secret"]
 
 [[rules]]
 id = "aws-secret-key"
-description = "AWS Secret Access Key"
-regex = '''(?i)aws[_-]?secret[_-]?access[_-]?key\s*[:=]\s*['"][A-Za-z0-9/+=]{20,}['"]'''
-tags = ["aws"]
-
-[[rules]]
-id = "google-api-key"
-description = "Google API key"
-regex = '''AIza[0-9A-Za-z\-_]{35}'''
-tags = ["google"]
+description = "AWS Secret Key"
+regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["aws", "secret"]
 
 [[rules]]
 id = "github-token"
-description = "GitHub token"
-regex = '''ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}'''
-tags = ["github"]
-
-[[rules]]
-id = "slack-webhook"
-description = "Slack webhook URL"
-regex = '''https://hooks\.slack\.com/services/[A-Za-z0-9_/]+'''
-tags = ["slack"]
-
-# =========================
-# TOKENS / SECRETS
-# =========================
-
-[[rules]]
-id = "jwt-token"
-description = "JWT token"
-regex = '''eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'''
-tags = ["jwt"]
-
-[[rules]]
-id = "bearer-token"
-description = "Bearer token"
-regex = '''Bearer\s+[A-Za-z0-9\-\._~\+\/]+=*'''
-tags = ["auth"]
-
-# =========================
-# PRIVATE KEYS
-# =========================
+description = "GitHub Token"
+regex = '''(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36}'''
+tags = ["github", "token"]
 
 [[rules]]
 id = "private-key"
-description = "Private key block"
-regex = '''-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----'''
+description = "Private Key"
+regex = '''-----BEGIN (RSA|EC|OPENSSH|DSA) PRIVATE KEY-----'''
 tags = ["key", "private"]
 
-# =========================
-# DATABASE CONNECTION STRINGS
-# =========================
-
 [[rules]]
-id = "db-connection-string"
-description = "Database connection string"
-regex = '''(mongodb|postgres|mysql)://[^:]+:[^@]+@[^ ]+'''
-tags = ["database"]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|secret|token)['\"]?\s*[=:]\s*['\"]?[a-f0-9]{16,64}['\"]?'''
+tags = ["api", "key"]
 
-# =========================
-# NPM / PYPI TOKENS
-# =========================
+[allowlist]
+# Files to ignore
+files = [
+    '''\.lock$''',
+    '''\.git/config''',
+    '''\.gitattributes''',
+    '''\.gitignore''',
+    '''go\.sum''',
+    '''package-lock\.json''',
+    '''yarn\.lock''',
+    '''pnpm-lock\.yaml''',
+]
 
-[[rules]]
-id = "npm-token"
-description = "NPM token"
-regex = '''npm_[A-Za-z0-9]{20,}'''
-tags = ["npm"]
+# Paths to ignore
+paths = [
+    '''gitleaks.toml''',
+    '''\.git/''',
+    '''\.vscode/''',
+    '''\.idea/''',
+    '''node_modules/''',
+    '''venv/''',
+    '''\.env\.example''',
+]
 
-[[rules]]
-id = "pypi-token"
-description = "PyPI token"
-regex = '''pypi-[A-Za-z0-9]{20,}'''
-tags = ["pypi"]
+# Commits to ignore (by SHA)
+commits = []
+
+# Regex for matching false positives
+regexes = [
+    ''''''  # Empty string matches nothing
+]
