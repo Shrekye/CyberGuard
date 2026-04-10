@@ -400,7 +400,7 @@ jobs:
             wapiti \
              -u http://127.0.0.1:5000 \
              --scope folder \
-             -m sql,xss,xxe,ssrf,csrf,headers,wapp \
+             -m xss,sql,exec,xxe,crlf \
              --depth 3 \
              --max-scan-time 300 \
              -v 1 
