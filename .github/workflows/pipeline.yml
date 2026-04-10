@@ -341,7 +341,7 @@ jobs:
         - name: ZAP Baseline Scan
           uses: zaproxy/action-baseline@v0.12.0
           with:
-            target: 'http://localhost:5000'
+            target: 'http://127.0.0.1:5000'
             artifact_name: 'zap-scan-reports'
             rules_file_name: '.zap/rules.tsv'
             token: ${{ secrets.GITHUB_TOKEN }}
