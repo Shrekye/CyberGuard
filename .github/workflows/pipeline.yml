@@ -344,7 +344,7 @@ jobs:
             target: 'http://localhost:5000'
             artifact_name: 'zap-scan-reports'
             token: ${{ secrets.GITHUB_TOKEN }}
-            cmd_options: '-r zap-reports/report.html'
+            cmd_options: '-r zap-reports/report.html -J zap-reports/report.json -w zap-reports/report.md'
 
         - name: Upload ZAP reports
           if: always()
