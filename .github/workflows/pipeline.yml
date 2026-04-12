@@ -383,7 +383,7 @@ jobs:
               --name cyberguard-test \
               -p 5000:5000 \
               cyberguard:${{ github.sha }}
-            sleep 5 
+            sleep 10 
         - name: Set up python
           uses: actions/setup-python@v5
           with:
@@ -393,7 +393,7 @@ jobs:
           run: pip install wapiti3
 
         - name: Prepare report
-          run: mkdir -p report-wapiti
+          run: mkdir -p wapiti-report
         
         - name: Run Wapiti
           run: |
