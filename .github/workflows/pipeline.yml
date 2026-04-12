@@ -404,14 +404,14 @@ jobs:
              --depth 3 \
              --max-scan-time 300 \
              -v 1 \
-             -f html -o wapiti-reports/report.html \
-             -f json -o wapiti-reports/report.json
+             -f html -o wapiti-report/report.html \
+             -f json -o wapiti-report/report.json
         - name: upload Artifact
           if: always()
           uses: actions/upload-artifact@v4
           with:
             name: wapiti-scan-reports
-            path: wapiti-reports/
+            path: wapiti-report/
         
         - name: clean Docker
           if: always()
