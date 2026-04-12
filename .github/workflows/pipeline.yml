@@ -306,7 +306,7 @@ jobs:
   dast-zap:
       name: OWASP ZAP Scan
       runs-on: ubuntu-24.04
-      #needs: trivy-postbuild
+      needs: trivy-postbuild
       permissions:
         contents: read
         issues: write 
