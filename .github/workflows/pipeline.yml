@@ -411,7 +411,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: wapiti-scan-reports
-            path: wapi-reports/
+            path: wapiti-reports/
         
         - name: clean Docker
           if: always()
