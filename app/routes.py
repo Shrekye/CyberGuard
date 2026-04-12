@@ -148,7 +148,7 @@ def login():
 
 @main_bp.route('/login/google')
 def google_login():
-    # nosemgrep: flask-url-for-external-true
+    # nosemgrep: python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
     redirect_uri = url_for('main.google_authorize', _external=True, _scheme="https")
     return google.authorize_redirect(redirect_uri)
 
