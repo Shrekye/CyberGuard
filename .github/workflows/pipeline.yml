@@ -51,7 +51,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🚨 **Security Alert**: Secrets detected in this PR. Please remove them before merging.'
+              body: ' **Security Alert**: Secrets detected in this PR. Please remove them before merging.'
             })
 
   trufflehog:
@@ -403,7 +403,7 @@ jobs:
              -m xss,sql,exec,xxe,crlf \
              --depth 3 \
              --max-scan-time 300 \
-             -v 1 
+             -v 1 \
              -f html -o wapiti-reports/report.html \
              -f json -o wapiti-reports/report.json
         - name: upload Artifact
@@ -411,7 +411,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: wapiti-scan-reports
-            path: wapi-reports/ 
+            path: wapi-reports/
         
         - name: clean Docker
           if: always()
