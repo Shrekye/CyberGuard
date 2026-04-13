@@ -408,10 +408,10 @@ def logs_demo():
 
     current_app.logger.info("Request received on /logs-demo")
 
-    if random.random() < 0.5:
+    if random.random() < 0.5:  # nosec
         current_app.logger.warning("Unusual traffic pattern detected")
 
-    if random.random() < 0.2:
+    if random.random() < 0.2:  # nosec
         current_app.logger.error("Simulated internal failure")
         return {"error": "internal failure"}, 500
 
