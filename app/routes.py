@@ -385,7 +385,7 @@ def info():
 @main_bp.route("/random-fail")
 def random_fail():
     try:
-        if random.randint(1, 3) == 1:
+        if random.randint(1, 3) == 1:  # nosec
             raise Exception("Simulated production bug")
 
         return {
