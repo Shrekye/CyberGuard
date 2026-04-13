@@ -128,6 +128,30 @@ def create_app():
     app.register_blueprint(main_bp)
 
     # ======================
+    # LOGGING CONFIG (PRO SAFE)
+    # ======================
+
+    import logging
+
+    handler = logging.StreamHandler()
+
+    handler.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
+    )
+
+    handler.setFormatter(formatter)
+
+    if not app.logger.handlers:
+        app.logger.addHandler(handler)
+    else:
+        app.logger.handlers[0].setFormatter(formatter)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.propagate = False
+
+    # ======================
     # CREATE DB TABLES
     # ======================
     with app.app_context():

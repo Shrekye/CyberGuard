@@ -375,3 +375,43 @@ def info():
     logging.info(f"/info called - mode={mode}, port={port}")
 
     return data
+
+
+# =========================
+# RANDOM FAIL (simulation bug)
+# =========================
+
+@main_bp.route("/random-fail")
+def random_fail():
+    try:
+        if random.randint(1, 3) == 1:
+            raise Exception("Simulated production bug")
+
+        return {
+            "status": "success",
+            "message": "Request succeeded"
+        }, 200
+
+    except Exception as e:
+        current_app.logger.error(f"Random fail triggered: {str(e)}")
+
+        abort(500, description="Internal server error (simulated)")
+
+
+# =========================
+# LOGS DEMO
+# =========================
+
+@main_bp.route("/logs-demo")
+def logs_demo():
+
+    current_app.logger.info("Request received on /logs-demo")
+
+    if random.random() < 0.5:
+        current_app.logger.warning("Unusual traffic pattern detected")
+
+    if random.random() < 0.2:
+        current_app.logger.error("Simulated internal failure")
+        return {"error": "internal failure"}, 500
+
+    return {"status": "ok"}, 200
