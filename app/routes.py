@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, abort
+from flask import Blueprint, render_template, request, redirect, url_for, session, abort, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from . import db
 from . import google
 import secrets
+import random
 import time
 import re
 
@@ -301,3 +302,24 @@ def category_view(category):
         return "Invalid category", 400
 
     return render_template("category.html", topics=topics, category=category)
+
+
+# =========================
+# RANDOM FAIL (simulation bug)
+# =========================
+
+@main_bp.route("/random-fail")
+def random_fail():
+    try:
+        if random.randint(1, 3) == 1:
+            raise Exception("Simulated production bug")
+
+        return {
+            "status": "success",
+            "message": "Request succeeded"
+        }, 200
+
+    except Exception as e:
+        current_app.logger.error(f"Random fail triggered: {str(e)}")
+
+        abort(500, description="Internal server error (simulated)")
