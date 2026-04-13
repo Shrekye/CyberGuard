@@ -416,3 +416,22 @@ def logs_demo():
         return {"error": "internal failure"}, 500
 
     return {"status": "ok"}, 200
+
+
+# =========================
+# HEALTH CHECK (Feature 1)
+# =========================
+
+@main_bp.route("/health")
+def health():
+    try:
+        status_data = {
+            "status": "up",
+            "timestamp": time.time(),
+            "service": "CyberGuard"
+        }
+        logging.info("Health check endpoint called - Status: UP")
+        return status_data, 200
+    except Exception as e:
+        logging.error(f"Health check failed: {str(e)}")
+        return {"status": "DOWN", "error": str(e)}, 500
