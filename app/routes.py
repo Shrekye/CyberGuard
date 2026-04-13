@@ -6,14 +6,27 @@ from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from . import db
 from . import google
 import secrets
-import random
 import time
 import re
 import os
 import uuid
+import sys
+import socket
+import logging
 
 
 main_bp = Blueprint("main", __name__)
+
+
+# =========================
+# LOGGER CONFIG
+# =========================
+
+logging.basicConfig(
+    filename="app_info.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 # =========================
@@ -55,14 +68,12 @@ def inject_csrf():
 # =========================
 
 def validate_username(username):
-    """Valide le format du nom d'utilisateur"""
     if not username or len(username) < 3 or len(username) > 50:
         return False
     return bool(re.match(r'^[a-zA-Z0-9_-]+$', username))
 
 
 def validate_password(password):
-    """Valide la force du mot de passe"""
     if not password or len(password) < 8:
         return False
     return bool(re.search(r'[A-Za-z]', password) and re.search(r'[0-9]', password))
@@ -98,7 +109,7 @@ def register():
         password = request.form.get("password", "")
 
         if not validate_username(username):
-            return "Invalid username format (3-50 chars, alphanumeric, underscore, dash)", 400
+            return "Invalid username format", 400
 
         if not validate_password(password):
             return "Password must be at least 8 characters with letters and numbers", 400
@@ -151,7 +162,6 @@ def login():
 
 @main_bp.route('/login/google')
 def google_login():
-    # nosemgrep: python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
     redirect_uri = url_for('main.google_authorize', _external=True, _scheme="https")
     return google.authorize_redirect(redirect_uri)
 
@@ -234,11 +244,12 @@ def create_topic():
             image.save(image_path)
 
             image_filename = unique_name
+
         if not title or len(title) < 3 or len(title) > 200:
             return "Title must be between 3 and 200 characters", 400
 
         if len(content) > 10000:
-            return "Content too long (max 10000 chars)", 400
+            return "Content too long", 400
 
         if category not in ["red", "blue", "purple"]:
             return "Invalid category", 400
@@ -296,7 +307,7 @@ def topic_view(category, topic_id):
             return "Content cannot be empty", 400
 
         if len(content) > 5000:
-            return "Content too long (max 5000 chars)", 400
+            return "Content too long", 400
 
         time.sleep(0.3)
 
@@ -338,21 +349,29 @@ def category_view(category):
 
 
 # =========================
-# RANDOM FAIL (simulation bug)
+# INFO ENDPOINT
 # =========================
 
-@main_bp.route("/random-fail")
-def random_fail():
-    try:
-        if random.randint(1, 3) == 1:
-            raise Exception("Simulated production bug")
+@main_bp.route("/info")
+def info():
+    mode = os.getenv("APP_MODE")
+    if not mode:
+        return {"error": "APP_MODE not set"}, 500
 
-        return {
-            "status": "success",
-            "message": "Request succeeded"
-        }, 200
+    port = os.getenv("PORT")
 
-    except Exception as e:
-        current_app.logger.error(f"Random fail triggered: {str(e)}")
+    data = {
+        "app": "mon-api",
+        "version": "1.0",
+        "mode": mode,
+        "port": port,
+        "config": {
+            "debug": os.getenv("FLASK_DEBUG")
+        },
+        "python_version": sys.version,
+        "hostname": socket.gethostname()
+    }
 
-        abort(500, description="Internal server error (simulated)")
+    logging.info(f"/info called - mode={mode}, port={port}")
+
+    return data
