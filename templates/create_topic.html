@@ -4,10 +4,11 @@
 
 <h2>Create New Topic</h2>
 <br>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="text" name="title" placeholder="Topic title" required maxlength="100"><br><br>
     <textarea name="content" placeholder="Your first post" maxlength="600"></textarea><br><br>
+    <input type="file" name="image" accept="image/*"><br><br>
     <select name="category" required>
         <option value="red">Red</option>
         <option value="blue">Blue</option>

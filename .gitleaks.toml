@@ -1,0 +1,108 @@
+# .gitleaks.toml
+title = "Custom Gitleaks Configuration"
+
+# Étendre la configuration par défaut de Gitleaks
+[extend]
+useDefault = true
+
+# Règles personnalisées
+[[rules]]
+id = "custom-api-key"
+description = "Custom API Key Pattern"
+regex = '''(?i)custom[_-]?api[_-]?key["'`\s]*[=:]["'`\s]*[A-Za-z0-9]{32}'''
+tags = ["api", "key"]
+severity = "HIGH"
+
+[[rules]]
+id = "database-password"
+description = "Database Password"
+regex = '''(?i)db[_-]?pass(word)?["'`\s]*[=:]["'`\s]*[A-Za-z0-9@#$%^&*!]{8,}'''
+tags = ["database", "password"]
+severity = "HIGH"
+
+# Règle avancée
+[[rules]]
+id = "stripe-secret-key"
+description = "Stripe Secret Key"
+regex = '''sk_(test|live)_[A-Za-z0-9]{24,}'''
+tags = ["stripe", "payment"]
+severity = "CRITICAL"
+
+# Règles spécifiques à l'organisation
+[[rules]]
+id = "mycompany-api-token"
+description = "MyCompany Internal API Token"
+regex = '''(?i)mycompany[_-]?token["'`\s]*[=:]["'`\s]*[A-Za-z0-9]{40,}'''
+tags = ["mycompany", "api"]
+severity = "HIGH"
+
+[[rules]]
+id = "internal-service-key"
+description = "Internal Service Authentication Key"
+regex = '''(?i)(auth|service)[_-]?key["'`\s]*[=:]["'`\s]*([A-Za-z0-9+/]{64}={0,2})'''
+tags = ["internal", "auth"]
+severity = "HIGH"
+
+# Règles pour les bases de données
+[[rules]]
+id = "postgresql-connection"
+description = "PostgreSQL Connection String"
+regex = '''postgresql://([^:]+):([^@]+)@([^/]+)/(.+)'''
+tags = ["database", "postgresql"]
+severity = "CRITICAL"
+
+[[rules]]
+id = "mongodb-uri"
+description = "MongoDB Connection URI"
+regex = '''mongodb://([^:]+):([^@]+)@([^/]+)/(.+)'''
+tags = ["database", "mongodb"]
+severity = "CRITICAL"
+
+# Configuration globale d'allowlist
+[allowlist]
+description = "Global allowlist for false positives"
+
+# Patterns à ignorer
+regexes = [
+  '''(?i)test[_-]?(key|token|secret)''',
+  '''(?i)(fake|dummy|example)[_-]?(key|token)''',
+  '''[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}''',
+  '''https?://[^/]+/[^/]+''',
+  '''localhost:[0-9]+''',
+  '''sqlite:///forum\.db''',  # Votre faux positif spécifique
+]
+
+# Chemins à ignorer
+paths = [
+  "docs/",
+  "examples/",
+  "test/",
+  "tests/",
+  "spec/",
+  "fixtures/",
+  "vendor/",
+  "node_modules/",
+  ".git/",
+  "__pycache__/",
+  "venv/",
+  "env/",
+]
+
+# Fichiers à ignorer
+files = [
+]
+
+# Commits à ignorer (optionnel - ajoutez les SHA des commits problématiques)
+commits = [
+  # "ab673297c3fe18925a6618d43c43eb998945d632",  # Décommentez pour ignorer ce commit spécifique
+]
+
+# Mots à ignorer dans les résultats
+stopwords = [
+  "test",
+  "fake",
+  "example",
+  "dummy",
+  "sample",
+  "demo"
+]
