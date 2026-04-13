@@ -38,7 +38,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    topic_id = db.Column(db.Integer)
-    topic_type = db.Column(db.String(10))
+    topic_id = db.Column(db.Integer)           # id du topic
+    topic_type = db.Column(db.String(10))     # "red", "blue", "purple"
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     image = db.Column(db.String(255), nullable=True)

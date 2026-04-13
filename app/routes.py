@@ -55,12 +55,14 @@ def inject_csrf():
 # =========================
 
 def validate_username(username):
+    """Valide le format du nom d'utilisateur"""
     if not username or len(username) < 3 or len(username) > 50:
         return False
     return bool(re.match(r'^[a-zA-Z0-9_-]+$', username))
 
 
 def validate_password(password):
+    """Valide la force du mot de passe"""
     if not password or len(password) < 8:
         return False
     return bool(re.search(r'[A-Za-z]', password) and re.search(r'[0-9]', password))
@@ -96,7 +98,7 @@ def register():
         password = request.form.get("password", "")
 
         if not validate_username(username):
-            return "Invalid username format", 400
+            return "Invalid username format (3-50 chars, alphanumeric, underscore, dash)", 400
 
         if not validate_password(password):
             return "Password must be at least 8 characters with letters and numbers", 400
@@ -215,7 +217,6 @@ def create_topic():
         content = request.form.get("content", "").strip()
         category = request.form.get("category")
 
-        # IMAGE
         image = request.files.get("image")
         image_filename = None
 
@@ -233,20 +234,17 @@ def create_topic():
             image.save(image_path)
 
             image_filename = unique_name
-
-        # VALIDATION
         if not title or len(title) < 3 or len(title) > 200:
             return "Title must be between 3 and 200 characters", 400
 
         if len(content) > 10000:
-            return "Content too long", 400
+            return "Content too long (max 10000 chars)", 400
 
         if category not in ["red", "blue", "purple"]:
             return "Invalid category", 400
 
         time.sleep(0.3)
 
-        # CREATE TOPIC
         if category == "red":
             topic = RedTopic(title=title, user_id=current_user.id)
         elif category == "blue":
@@ -257,7 +255,6 @@ def create_topic():
         db.session.add(topic)
         db.session.commit()
 
-        # CREATE POST (avec image)
         if content or image_filename:
             post = Post(
                 content=content,
@@ -299,7 +296,7 @@ def topic_view(category, topic_id):
             return "Content cannot be empty", 400
 
         if len(content) > 5000:
-            return "Content too long", 400
+            return "Content too long (max 5000 chars)", 400
 
         time.sleep(0.3)
 
@@ -321,10 +318,10 @@ def topic_view(category, topic_id):
 
     return render_template("topic.html", topic=topic, posts=posts, category=category)
 
+
 # =========================
 # CATEGORY
 # =========================
-
 
 @main_bp.route("/category/<category>")
 def category_view(category):
