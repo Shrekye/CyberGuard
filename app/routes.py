@@ -10,9 +10,23 @@ import time
 import re
 import os
 import uuid
+import sys
+import socket
+import logging
 
 
 main_bp = Blueprint("main", __name__)
+
+
+# =========================
+# LOGGER CONFIG
+# =========================
+
+logging.basicConfig(
+    filename="app_info.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 # =========================
@@ -148,7 +162,6 @@ def login():
 
 @main_bp.route('/login/google')
 def google_login():
-    # nosemgrep: python.flask.security.audit.flask-url-for-external-true.flask-url-for-external-true
     redirect_uri = url_for('main.google_authorize', _external=True, _scheme="https")
     return google.authorize_redirect(redirect_uri)
 
@@ -214,7 +227,6 @@ def create_topic():
         content = request.form.get("content", "").strip()
         category = request.form.get("category")
 
-        # IMAGE
         image = request.files.get("image")
         image_filename = None
 
@@ -233,7 +245,6 @@ def create_topic():
 
             image_filename = unique_name
 
-        # VALIDATION
         if not title or len(title) < 3 or len(title) > 200:
             return "Title must be between 3 and 200 characters", 400
 
@@ -245,7 +256,6 @@ def create_topic():
 
         time.sleep(0.3)
 
-        # CREATE TOPIC
         if category == "red":
             topic = RedTopic(title=title, user_id=current_user.id)
         elif category == "blue":
@@ -256,7 +266,6 @@ def create_topic():
         db.session.add(topic)
         db.session.commit()
 
-        # CREATE POST (avec image)
         if content or image_filename:
             post = Post(
                 content=content,
@@ -320,10 +329,10 @@ def topic_view(category, topic_id):
 
     return render_template("topic.html", topic=topic, posts=posts, category=category)
 
+
 # =========================
 # CATEGORY
 # =========================
-
 
 @main_bp.route("/category/<category>")
 def category_view(category):
@@ -337,3 +346,32 @@ def category_view(category):
         return "Invalid category", 400
 
     return render_template("category.html", topics=topics, category=category)
+
+
+# =========================
+# INFO ENDPOINT
+# =========================
+
+@main_bp.route("/info")
+def info():
+    mode = os.getenv("APP_MODE")
+    if not mode:
+        return {"error": "APP_MODE not set"}, 500
+
+    port = os.getenv("PORT")
+
+    data = {
+        "app": "mon-api",
+        "version": "1.0",
+        "mode": mode,
+        "port": port,
+        "config": {
+            "debug": os.getenv("FLASK_DEBUG")
+        },
+        "python_version": sys.version,
+        "hostname": socket.gethostname()
+    }
+
+    logging.info(f"/info called - mode={mode}, port={port}")
+
+    return data
