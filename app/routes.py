@@ -6,8 +6,8 @@ from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from . import db
 from . import google
 import secrets
-import random
 import time
+import random
 import re
 import os
 import uuid
