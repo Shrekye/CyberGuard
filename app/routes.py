@@ -7,7 +7,7 @@ from . import db
 from . import google
 import secrets
 import time
-import random  # nosec 
+import random  # nosec
 import re
 import os
 import uuid
