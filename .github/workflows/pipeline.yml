@@ -453,5 +453,6 @@ jobs:
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           IMAGE="ghcr.io/$OWNER/cyberguard:${{ github.sha }}"
-          docker build -t $IMAGE_NAME .
-          docker push $IMAGE_NAME
+
+          docker build -t $IMAGE .
+          docker push $IMAGE
