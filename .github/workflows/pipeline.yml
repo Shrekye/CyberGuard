@@ -437,7 +437,7 @@ jobs:
     name: Release Docker image to GHCR
     runs-on: ubuntu-24.04
     needs: dast-Wapiti
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' 
     permissions:
       contents: read
       packages: write
