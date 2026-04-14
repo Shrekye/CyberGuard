@@ -437,7 +437,7 @@ jobs:
     name: Release Docker image to GHCR
     runs-on: ubuntu-24.04
     needs: dast-Wapiti
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' 
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: read
       packages: write
@@ -459,7 +459,7 @@ jobs:
           Based_Image="ghcr.io/$OWNER/cyberguard"
           docker build \
             -t $BASE_Image:${{ github.sha }} \
-            -t $BASE_Image:latest
+            -t $BASE_Image:latest \
             -t dev .
 
           docker push $BASE_Image:${{ github.sha }}
