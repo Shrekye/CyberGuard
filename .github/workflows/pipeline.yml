@@ -547,6 +547,12 @@ jobs:
           ls -la
           python -m compileall .
 
+      - name: DEBUG GITHUB CONTEXT
+        run: |
+          echo "ref: $GITHUB_REF"
+          echo "ref_name: $GITHUB_REF_NAME"
+          echo "event: $GITHUB_EVENT_NAME"
+
       - name: Deploy to Render (dev)
         if: github.ref == 'refs/heads/dev'
         env:
