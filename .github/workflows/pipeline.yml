@@ -437,7 +437,6 @@ jobs:
     name: Release Docker image to GHCR
     runs-on: ubuntu-24.04
     needs: dast-Wapiti
-#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: read
       packages: write
@@ -454,7 +453,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image (main)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push, merge'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           BASE_IMAGE="ghcr.io/$OWNER/cyberguard"
@@ -484,25 +483,37 @@ jobs:
           docker push $BASE_IMAGE:dev
 
   ci:
-      runs-on: ubuntu-24.04
-      needs: release-GHCR
-      steps:
-        - uses: actions/checkout@v5
-        - name: Test
-          run: |
-            npm install
-            npm run test
+    runs-on: ubuntu-24.04
+    needs: release-GHCR
 
-        - name: Deploy to Render (dev)
-          if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
-          env:
-            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-          run: |
-            curl -X POST "$deploy_url"
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Deploy to Render (main)
-          if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-          env:
-            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
-          run: |
-            curl -X POST "$deploy_url"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Verify project structure
+        run: ls -la
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Deploy to Render (dev)
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -X POST "$deploy_url"
+
+      - name: Deploy to Render (main)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
+        run: |
+          curl -X POST "$deploy_url"
