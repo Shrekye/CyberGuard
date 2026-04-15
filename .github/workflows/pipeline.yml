@@ -453,7 +453,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (main)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          BASE_IMAGE="ghcr.io/$OWNER/cyberguard"
+
+          docker build \
+            -t $BASE_IMAGE:${{ github.sha }} \
+            -t $BASE_IMAGE:latest \
+            -t $BASE_IMAGE:main .
+
+          docker push $BASE_IMAGE:${{ github.sha }}
+          docker push $BASE_IMAGE:latest
+          docker push $BASE_IMAGE:main
+
+      - name: Build and push Docker image (dev)
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           BASE_IMAGE="ghcr.io/$OWNER/cyberguard"
@@ -477,9 +493,16 @@ jobs:
             npm install
             npm run test
 
-        - name: Deploy
+        - name: Deploy to Render (dev)
           if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
           env:
             deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
           run: |
-            curl "$deploy_url"
+            curl -X POST "$deploy_url"
+
+        - name: Deploy to Render (main)
+          if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+          env:
+            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
+          run: |
+            curl -X POST "$deploy_url"
