@@ -1,0 +1,508 @@
+name: CI Pipeline
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+
+  gitleaks:
+    name: Gitleaks Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        with:
+          config-path: .gitleaks.toml
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: results.sarif
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: ' **Security Alert**: Secrets detected in this PR. Please remove them before merging.'
+            })
+
+  trufflehog:
+    name: TruffleHog Scan
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: .
+
+  flake8-lint:
+    name: Flake8 Lint
+    runs-on: ubuntu-24.04
+    needs: [gitleaks, trufflehog]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Create flake8 config
+        run: |
+          echo "[flake8]" > .flake8
+          echo "max-line-length = 120" >> .flake8
+          echo "exclude = .git,__pycache__,venv,env" >> .flake8
+
+      - name: Run flake8
+        run: flake8 .
+
+  bandit-scan:
+    name: SAST Bandit
+    runs-on: ubuntu-24.04
+    needs: flake8-lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run Bandit scan
+        run: |
+          bandit -r . \
+            --skip B104 \
+            --format json \
+            --output bandit-report.json \
+        # --skip : ignore les tests spécifiés
+        # B104 : hardcoded_bind_all_interfaces (normal pour Docker)
+        # B105-107 : hardcoded_password (placeholder dev)
+        # B404 : import_subprocess
+        # B603 : subprocess_without_shell_equals_true
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  pip-audit:
+    name: pip-audit security scan
+    runs-on: ubuntu-24.04
+    needs: bandit-scan
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pip-audit
+        run: pip-audit
+    
+  trivy-unprebuild:
+    name: Trivy Scan PreBuild
+    runs-on: ubuntu-24.04
+    needs: pip-audit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: Shrekye/CyberGuard
+          ref: develop
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  trivy-postbuild:
+    name: Trivy Scan PostBuild Docker Image
+    runs-on: ubuntu-24.04
+    needs: trivy-unprebuild
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image locally
+        run: docker build -t cyberguard-local:${{ github.sha }} .
+
+#      - name: Create Trivy ignore file
+#        run: |
+#          cat > .trivyignore << 'EOF'
+#          # CVE-2026-28390 - False positive: OpenSSL 3.5.5 includes the fix
+#          CVE-2026-28390
+#          EOF
+
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: 'cyberguard-local:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+#          trivyignores: .trivyignore
+  
+  dast_nikto:
+    name: DAST Nikto Scan
+    runs-on: ubuntu-24.04
+    needs: trivy-postbuild
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker container
+        run: docker build -t cyberguard:${{ github.sha }} .
+
+      - name: Run Docker container
+        run: |
+          docker run -d --name cyberguard-test -p 5000:5000 cyberguard:${{ github.sha }}
+          echo "Container started, waiting 3 seconds..."
+          sleep 3
+
+      - name: Debug container and network
+        run: |
+          echo "=== Container status ==="
+          docker ps -a | grep cyberguard-test || true
+          
+          echo "=== Container logs ==="
+          docker logs cyberguard-test 2>&1 | tail -30 || true
+          
+          echo "=== Get container IP ==="
+          CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' cyberguard-test)
+          echo "Container IP: $CONTAINER_IP"
+          echo "CONTAINER_IP=$CONTAINER_IP" >> $GITHUB_ENV
+          
+          echo "=== Check if port 5000 is exposed ==="
+          docker port cyberguard-test || true
+          
+          echo "=== Quick test localhost:5000 ==="
+          curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:5000/ || echo "Connection failed"
+
+      - name: Wait for Flask app to be ready
+        run: |
+          echo "Container IP: $CONTAINER_IP"
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            
+            # Vérifier si l'app répond (peu importe le code HTTP)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/ 2>/dev/null || echo "000")
+            
+            if [ "$HTTP_CODE" != "000" ]; then
+              echo " App is responding (HTTP $HTTP_CODE)!"
+              echo "APP_ENDPOINT=localhost" >> $GITHUB_ENV
+              exit 0
+            fi
+            
+            echo "Waiting for app... ($ATTEMPT/$MAX_ATTEMPTS) - Status: $HTTP_CODE"
+            
+            # Afficher les logs toutes les 10 tentatives
+            if [ $((ATTEMPT % 10)) -eq 0 ]; then
+              echo "--- Container logs (attempt $ATTEMPT) ---"
+              docker logs cyberguard-test 2>&1 | tail -15 || true
+            fi
+            
+            sleep 2
+          done
+          
+          echo " App failed to respond after $MAX_ATTEMPTS attempts"
+          echo "=== Final container logs ==="
+          docker logs cyberguard-test 2>&1 || true
+          exit 1
+
+      - name: Show Flask logs for debugging
+        run: |
+          echo "=== Complete Flask logs ==="
+          docker logs cyberguard-test 2>&1
+
+      - name: Install Nikto
+        run: sudo apt-get update && sudo apt-get install -y nikto
+
+      - name: Run Nikto scan
+        run: |
+          TARGET="http://localhost:5000"
+          echo "Scanning target: $TARGET"
+          nikto -h $TARGET -output nikto_report.txt
+          echo "=== Nikto scan completed ==="
+
+      - name: Display Nikto report
+        run: |
+          echo "=== Nikto Scan Results ==="
+          if [ -f nikto_report.txt ]; then
+            cat nikto_report.txt
+          else
+            echo "No report generated"
+          fi
+
+      - name: Upload Nikto report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nikto-report
+          path: nikto_report.txt
+
+      - name: Cleanup Docker container
+        if: always()
+        run: |
+          echo "Cleaning up container..."
+          docker rm -f cyberguard-test || true
+          docker system prune -f || true
+          echo "Cleanup complete"
+
+  dast-zap:
+      name: OWASP ZAP Scan
+      runs-on: ubuntu-24.04
+      needs: trivy-postbuild
+      permissions:
+        contents: read
+        issues: write 
+        pull-requests: write
+      
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Build Docker image
+          run: |
+            docker build -t cyberguard:${{ github.sha }} .
+
+        - name: Run application
+          run: |
+            docker run -d \
+              --name cyberguard-test \
+              --network=host \
+              cyberguard:${{ github.sha }}
+            sleep 2
+
+        - name: Create reports directory with proper permissions
+          run: |
+            sudo chmod -R 777 .
+            mkdir -p zap_reports
+            sudo chmod 777 zap_reports
+            cd zap_reports
+            touch report_json.json report_md.md report_html.html
+            sudo chmod 666 report_json.json report_md.md report_html.html
+            cd ..
+
+        - name: ZAP Baseline Scan
+          uses: zaproxy/action-baseline@v0.12.0
+          with:
+            target: 'http://localhost:5000'
+            artifact_name: 'zap-scan-reports'
+            token: ${{ secrets.GITHUB_TOKEN }}
+            cmd_options: '-r zap-reports/report.html -J zap-reports/report.json -w zap-reports/report.md'
+
+        - name: Upload ZAP reports
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: zap-scan-reports
+            path: |
+              report-html.html
+              *.json
+              *.md
+            if-no-files-found: ignore
+
+        - name: Cleanup Docker container
+          if: always()
+          run: docker rm -f cyberguard-test
+    
+  dast-Wapiti:
+      name: Wapiti scan
+      runs-on:  ubuntu-24.04
+      needs: dast-zap
+      
+      permissions:
+        contents: read
+        issues: write
+        pull-requests: write
+
+      steps:
+        - name: checkout code
+          uses: actions/checkout@v4
+        - name: build Docker image
+          run : docker build -t cyberguard:${{ github.sha }} .
+        
+        - name: Run application
+          run: |
+            docker run -d \
+              --name cyberguard-test \
+              -p 5000:5000 \
+              cyberguard:${{ github.sha }}
+            sleep 10 
+        - name: Set up python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.12"
+        
+        - name: Install wapiti
+          run: pip install wapiti3
+
+        - name: Prepare report
+          run: mkdir -p wapiti-report
+        
+        - name: Run Wapiti
+          run: |
+            wapiti \
+             -u http://127.0.0.1:5000 \
+             --scope folder \
+             -m xss,sql,exec,xxe,crlf \
+             --depth 3 \
+             --max-scan-time 300 \
+             -v 1 \
+             -f html -o wapiti-report/report.html \
+             -f json -o wapiti-report/report.json
+        - name: upload Artifact
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: wapiti-scan-reports
+            path: wapiti-report/
+        
+        - name: clean Docker
+          if: always()
+          run: docker rm -f cyberguard-test
+
+  semgrep:
+    name: Semgrep SAST Scan
+    runs-on: ubuntu-24.04
+    needs: flake8-lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/ci
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  release-GHCR:
+    name: Release Docker image to GHCR
+    runs-on: ubuntu-24.04
+    needs: dast-Wapiti
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image (main)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          BASE_IMAGE="ghcr.io/$OWNER/cyberguard"
+
+          docker build \
+            -t $BASE_IMAGE:${{ github.sha }} \
+            -t $BASE_IMAGE:latest \
+            -t $BASE_IMAGE:main .
+
+          docker push $BASE_IMAGE:${{ github.sha }}
+          docker push $BASE_IMAGE:latest
+          docker push $BASE_IMAGE:main
+
+      - name: Build and push Docker image (dev)
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          BASE_IMAGE="ghcr.io/$OWNER/cyberguard"
+
+          docker build \
+            -t $BASE_IMAGE:${{ github.sha }} \
+            -t $BASE_IMAGE:latest \
+            -t $BASE_IMAGE:dev .
+
+          docker push $BASE_IMAGE:${{ github.sha }}
+          docker push $BASE_IMAGE:latest
+          docker push $BASE_IMAGE:dev
+
+  ci:
+      runs-on: ubuntu-24.04
+      needs: release-GHCR
+      steps:
+        - uses: actions/checkout@v5
+        - name: Test
+          run: |
+            npm install
+            npm run test
+
+        - name: Deploy to Render (dev)
+          if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+          env:
+            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          run: |
+            curl -X POST "$deploy_url"
+
+        - name: Deploy to Render (main)
+          if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+          env:
+            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
+          run: |
+            curl -X POST "$deploy_url"

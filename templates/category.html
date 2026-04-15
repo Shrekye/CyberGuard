@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page {{ category }}">
+
+<h1>{{ category|capitalize }} Topics</h1>
+
+<div class="topics">
+    {% for topic in topics %}
+        <div class="topic-card">
+            <a href="{{ url_for('main.topic_view', category=category, topic_id=topic.id) }}">
+                <h3>{{ topic.title }}</h3>
+            </a>
+            <p>By {{ topic.user.username }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+</div>
+
+{% endblock %}
