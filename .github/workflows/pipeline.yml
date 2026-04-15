@@ -554,7 +554,7 @@ jobs:
           echo "event: $GITHUB_EVENT_NAME"
 
       - name: Deploy to Render (dev)
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/develop'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: curl -X POST "$deploy_url"
