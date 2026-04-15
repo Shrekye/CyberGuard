@@ -207,6 +207,7 @@ Le projet intègre une pipeline de sécurité automatisée.
 - amélioration de la pipeline CI/CD
 - correction des rapports ZAP
 - optimisation du frontend
+- volumes pour la db
 
 ## Difficultés rencontrées
 
