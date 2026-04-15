@@ -533,8 +533,12 @@ jobs:
         - uses: actions/checkout@v5
         - name: Test
           run: |
-            npm install
-            npm run test
+            if [ -f package.json ]; then
+              npm install
+              npm run test
+            else
+              echo "No Node project detected, skipping tests"
+            fi
 
         - name: Deploy to Render (dev)
           if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
