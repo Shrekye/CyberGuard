@@ -530,7 +530,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Test
+        working-directory: .
         run: |
+          ls -la
           npm install
           npm run test
 
