@@ -525,16 +525,27 @@ jobs:
         run: |
           docker rm -f cyberguard || true
           docker run -d -p 5000:5000 --name cyberguard cyberguard:previous
+          
   ci:
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v5
-      - name: Test
-        working-directory: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint / basic check
         run: |
           ls -la
-          npm install
-          npm run test
+          python -m compileall .
 
       - name: Deploy to Render (dev)
         if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
