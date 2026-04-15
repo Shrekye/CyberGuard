@@ -467,4 +467,19 @@ jobs:
           docker push $BASE_IMAGE:latest
           docker push $BASE_IMAGE:dev
 
+  ci:
+      runs-on: ubuntu-24.04
+      needs: release-GHCR
+      steps:
+        - uses: actions/checkout@v5
+        - name: Test
+          run: |
+            npm install
+            npm run test
 
+        - name: Deploy
+          if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+          env:
+            deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          run: |
+            curl "$deploy_url"
