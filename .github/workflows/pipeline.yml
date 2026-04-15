@@ -548,13 +548,13 @@ jobs:
           python -m compileall .
 
       - name: Deploy to Render (dev)
-        if: github.ref_name == 'dev'
+        if: github.ref == 'refs/heads/dev'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: curl -X POST "$deploy_url"
 
       - name: Deploy to Render (main)
-        if: github.ref_name == 'main'
+        if: github.ref == 'refs/heads/main'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
         run: curl -X POST "$deploy_url"
