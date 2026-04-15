@@ -525,7 +525,7 @@ jobs:
         run: |
           docker rm -f cyberguard || true
           docker run -d -p 5000:5000 --name cyberguard cyberguard:previous
-          
+
   ci:
     runs-on: ubuntu-24.04
 
@@ -548,15 +548,13 @@ jobs:
           python -m compileall .
 
       - name: Deploy to Render (dev)
-        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+        if: github.ref_name == 'dev'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-        run: |
-          curl -X POST "$deploy_url"
+        run: curl -X POST "$deploy_url"
 
       - name: Deploy to Render (main)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref_name == 'main'
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
-        run: |
-          curl -X POST "$deploy_url"
+        run: curl -X POST "$deploy_url"
