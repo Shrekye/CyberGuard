@@ -482,50 +482,6 @@ jobs:
           docker push $BASE_IMAGE:latest
           docker push $BASE_IMAGE:dev
 
-  deploy-with-rollback:
-    name: Deploy with Auto Rollback
-    runs-on: ubuntu-24.04
-    needs: release-GHCR
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - run: docker build -t cyberguard:new .
-
-      - run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/cyberguard:latest || true
-          docker tag ghcr.io/${{ github.repository_owner }}/cyberguard:latest cyberguard:previous || true
-
-      - run: docker rm -f cyberguard || true
-
-      - run: docker run -d -p 5000:5000 --name cyberguard cyberguard:new
-
-      - run: sleep 5
-
-      - id: healthcheck
-        run: |
-          ATTEMPTS=5
-          SUCCESS=false
-          for i in $(seq 1 $ATTEMPTS); do
-            RESPONSE=$(curl -s http://localhost:5000/health || echo "")
-            STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/health || echo "000")
-            if [[ "$STATUS_CODE" -lt 400 ]] && echo "$RESPONSE" | grep -q '"status":"up"'; then
-              SUCCESS=true
-              break
-            fi
-            sleep 3
-          done
-          if [ "$SUCCESS" = false ]; then
-            echo "health_failed=true" >> $GITHUB_OUTPUT
-          else
-            echo "health_failed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - if: steps.healthcheck.outputs.health_failed == 'true'
-        run: |
-          docker rm -f cyberguard || true
-          docker run -d -p 5000:5000 --name cyberguard cyberguard:previous
-
   ci:
     runs-on: ubuntu-24.04
     needs: deploy-with-rollback
