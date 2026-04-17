@@ -80,22 +80,6 @@ def validate_password(password):
     return bool(re.search(r'[A-Za-z]', password) and re.search(r'[0-9]', password))
 
 
-# =========================
-# HOME
-# =========================
-
-#  @main_bp.route("/")
-#  def index():
-    red_topics = RedTopic.query.order_by(RedTopic.created_at.desc()).limit(10).all()
-    blue_topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).limit(10).all()
-    purple_topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).limit(10).all()
-    return render_template(
-        "index.html",
-        red_topics=red_topics,
-        blue_topics=blue_topics,
-        purple_topics=purple_topics
-    )
-
 
 # =========================
 # REGISTER

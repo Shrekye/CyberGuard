@@ -484,7 +484,7 @@ jobs:
 
   ci:
     runs-on: ubuntu-24.04
-    needs: release-GHCR
+    needs: deploy-with-rollback
 
     steps:
       - uses: actions/checkout@v5
