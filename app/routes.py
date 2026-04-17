@@ -80,10 +80,10 @@ def validate_password(password):
     return bool(re.search(r'[A-Za-z]', password) and re.search(r'[0-9]', password))
 
 
-
 # =========================
 # REGISTER
 # =========================
+
 
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
