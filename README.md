@@ -151,7 +151,9 @@ docker run -p 5000:5000 cyberguard
 #### Ou avec docker-compose :
 
 ```bash
-docker-compose up --build
+docker swarm init
+docker build -t cyberguard:latest .
+docker stack deploy -c docker-compose.yml cyberguard
 ```
 
 ## CI/CD et DevSecOps
