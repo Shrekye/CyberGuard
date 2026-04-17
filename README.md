@@ -156,6 +156,12 @@ docker build -t cyberguard:latest .
 docker stack deploy -c docker-compose.yml cyberguard
 ```
 
+#### Comment l'arrêter:
+
+```bash
+docker stack rm cyberguard
+```
+
 ## CI/CD et DevSecOps
 
 Le projet intègre une pipeline de sécurité automatisée.
