@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS builder
+FROM python:3.15-slim AS builder
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -8,8 +8,6 @@ RUN apt-get update && \
         libssl-dev \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
-
-RUN python -m pip install "pip>=26.1" --upgrade
 
 RUN openssl version
 
