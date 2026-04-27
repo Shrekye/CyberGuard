@@ -426,6 +426,7 @@ def check_all_routes(app):
     return results
 
 @main_bp.route("/health/full")
+
 def full_health_check():
     """
     Point de terminaison de diagnostic complet.
@@ -433,7 +434,7 @@ def full_health_check():
     route_status = check_all_routes(current_app)
     
   
-    faild = {k: v for k, v in route_status.items() if v != 200}
+    failed = {k: v for k, v in route_status.items() if v != 200}
     
     status_code = 200
     report = {
@@ -443,7 +444,7 @@ def full_health_check():
         "details": route_status
     }
 
-    if anomalies:
+    if failed:
         report["status"] = "UNHEALTHY"
         report["anomalies_detected"] = anomalies
         report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."

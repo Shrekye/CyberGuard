@@ -5,3 +5,4 @@ Flask-Talisman
 Werkzeug
 authlib
 requests
+python-dotenv
