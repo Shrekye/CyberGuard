@@ -442,7 +442,7 @@ def check_all_routes(app):
                     
     return results
 
-@main_bp.route("/health/full")
+@main_bp.route("/health")
 
 def full_health_check():
     """
@@ -463,7 +463,7 @@ def full_health_check():
 
     if failed:
         report["status"] = "UNHEALTHY"
-        report["anomalies_detected"] = anomalies
+        report["anomalies_detected"] = failed
         report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
         status_code = 503 
 
