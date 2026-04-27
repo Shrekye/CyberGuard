@@ -135,6 +135,30 @@ def register():
 
 
 # =========================
+# LOGIN
+# =========================
+
+@main_bp.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        time.sleep(0.5)
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=True)
+            session.permanent = True
+            return redirect(url_for("main.index"))
+
+        return "Invalid credentials", 401
+
+    return render_template("login.html")
+
+
+# =========================
 # GOOGLE OAUTH
 # =========================
 
