@@ -423,16 +423,48 @@ def logs_demo():
 # HEALTH CHECK (Feature 1)
 # =========================
 
-@main_bp.route("/health")
-def health():
-    try:
-        status_data = {
-            "status": "up",
-            "timestamp": time.time(),
-            "service": "CyberGuard"
-        }
-        logging.info("Health check endpoint called - Status: UP")
-        return status_data, 200
-    except Exception as e:
-        logging.error(f"Health check failed: {str(e)}")
-        return {"status": "DOWN", "error": str(e)}, 500
+def check_all_routes(app):
+    """
+    Simule une requête interne sur chaque route GET pour vérifier sa santé.
+    """
+    results = {}
+    with app.test_client() as client:
+        for rule in app.url_map.iter_rules():
+            if "GET" in rule.methods and len(rule.arguments) == 0:
+                if rule.rule.startswith(('/static', '/health')):
+                    continue
+                
+                try:
+                    response = client.get(rule.rule, follow_redirects=True)
+                    results[rule.rule] = response.status_code
+                except Exception as e:
+                    results[rule.rule] = f"CRASH: {str(e)}"
+                    
+    return results
+
+@main_bp.route("/health/full")
+def full_health_check():
+    """
+    Point de terminaison de diagnostic complet.
+    """
+    route_status = check_all_routes(current_app)
+    
+  
+    faild = {k: v for k, v in route_status.items() if v != 200}
+    
+    status_code = 200
+    report = {
+        "status": "HEALTHY",
+        "timestamp": time.time(),
+        "total_checked": len(route_status),
+        "details": route_status
+    }
+
+    if anomalies:
+        report["status"] = "UNHEALTHY"
+        report["anomalies_detected"] = anomalies
+        report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
+        status_code = 503 
+
+    return report, status_code
+
