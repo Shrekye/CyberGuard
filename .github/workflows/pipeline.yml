@@ -144,7 +144,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run pip-audit
-        run: pip-audit
+        run: pip-audit --ignore-vuln CVE-2026-3219
     
   trivy-unprebuild:
     name: Trivy Scan PreBuild

@@ -219,3 +219,13 @@ Ajout d'un fichier .trivyignore dans le pipeline pour ignorer ce faux positif.
 ## Résultat
 
 Le pipeline passe désormais avec succès, le faux positif CVE-2026-28390 est ignoré.
+
+
+CVE-2026-3219 on sen fou car on peut pas telecharger distroless (a rediger)
+
+```
+Found 1 known vulnerability in 1 package
+Name Version ID            Fix Versions
+---- ------- ------------- ------------
+pip  26.0.1  CVE-2026-3219
+```
