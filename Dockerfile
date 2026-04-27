@@ -9,7 +9,7 @@ RUN apt-get update && \
         python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python -m pip install --upgrade pip setuptools wheel
+RUN python -m pip install "pip>=25.2" --upgrade
 
 RUN openssl version
 
