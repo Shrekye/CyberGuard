@@ -414,8 +414,6 @@ def logs_demo():
     return {"status": "ok"}, 200
 
 
-
-
 # =========================
 # HEALTH CHECK
 # =========================
@@ -428,18 +426,22 @@ def check_all_routes(app):
             if "GET" in rule.methods and len(rule.arguments) == 0:
                 if rule.rule.startswith(('/static', '/health')):
                     continue
+
                 try:
                     response = client.get(rule.rule, follow_redirects=True)
                     results[rule.rule] = response.status_code
                 except Exception as e:
                     results[rule.rule] = f"CRASH: {str(e)}"
+
     return results
 
 
-@main_bp.route("/health")
+@main_bp.route("/health/full")
 def full_health_check():
     route_status = check_all_routes(current_app)
+
     failed = {k: v for k, v in route_status.items() if v != 200}
+
     status_code = 200
     report = {
         "status": "HEALTHY",
@@ -447,9 +449,11 @@ def full_health_check():
         "total_checked": len(route_status),
         "details": route_status
     }
+
     if failed:
         report["status"] = "UNHEALTHY"
         report["anomalies_detected"] = failed
-        report["message"] = "Certaines routes ne répondent pas avec un statut 200."
+        report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
         status_code = 503
+
     return report, status_code
