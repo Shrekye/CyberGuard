@@ -81,6 +81,24 @@ def validate_password(password):
 
 
 # =========================
+# HOME
+# =========================
+
+@main_bp.route("/")
+def index():
+    red_topics = RedTopic.query.order_by(RedTopic.created_at.desc()).limit(10).all()
+    blue_topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).limit(10).all()
+    purple_topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).limit(10).all()
+
+    return render_template(
+        "index.html",
+        red_topics=red_topics,
+        blue_topics=blue_topics,
+        purple_topics=purple_topics
+    )
+
+
+# =========================
 # REGISTER
 # =========================
 
@@ -114,30 +132,6 @@ def register():
         return redirect(url_for("main.login"))
 
     return render_template("register.html")
-
-
-# =========================
-# LOGIN
-# =========================
-
-@main_bp.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-
-        time.sleep(0.5)
-
-        user = User.query.filter_by(username=username).first()
-
-        if user and check_password_hash(user.password, password):
-            login_user(user, remember=True)
-            session.permanent = True
-            return redirect(url_for("main.index"))
-
-        return "Invalid credentials", 401
-
-    return render_template("login.html")
 
 
 # =========================
