@@ -86,21 +86,21 @@ def validate_password(password):
 
 @main_bp.route("/")
 def index():
-   red_topics = RedTopic.query.order_by(RedTopic.created_at.desc()).limit(10).all()
-   blue_topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).limit(10).all()
-   purple_topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).limit(10).all()
-   return render_template(
-       "index.html",
-       red_topics=red_topics,
-       blue_topics=blue_topics,
-       purple_topics=purple_topics
-   )
+    red_topics = RedTopic.query.order_by(RedTopic.created_at.desc()).limit(10).all()
+    blue_topics = BlueTopic.query.order_by(BlueTopic.created_at.desc()).limit(10).all()
+    purple_topics = PurpleTopic.query.order_by(PurpleTopic.created_at.desc()).limit(10).all()
+
+    return render_template(
+        "index.html",
+        red_topics=red_topics,
+        blue_topics=blue_topics,
+        purple_topics=purple_topics
+    )
 
 
 # =========================
 # REGISTER
 # =========================
-
 
 @main_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -380,7 +380,7 @@ def info():
 
 
 # =========================
-# RANDOM FAIL (simulation bug)
+# RANDOM FAIL
 # =========================
 
 @main_bp.route("/random-fail")
@@ -389,14 +389,10 @@ def random_fail():
         if random.randint(1, 3) == 1:  # nosec
             raise Exception("Simulated production bug")
 
-        return {
-            "status": "success",
-            "message": "Request succeeded"
-        }, 200
+        return {"status": "success", "message": "Request succeeded"}, 200
 
     except Exception as e:
         current_app.logger.error(f"Random fail triggered: {str(e)}")
-
         abort(500, description="Internal server error (simulated)")
 
 
@@ -406,7 +402,6 @@ def random_fail():
 
 @main_bp.route("/logs-demo")
 def logs_demo():
-
     current_app.logger.info("Request received on /logs-demo")
 
     if random.random() < 0.5:  # nosec
@@ -420,38 +415,32 @@ def logs_demo():
 
 
 # =========================
-# HEALTH CHECK (Feature 1)
+# HEALTH CHECK
 # =========================
 
 def check_all_routes(app):
-    """
-    Simule une requête interne sur chaque route GET pour vérifier sa santé.
-    """
     results = {}
     with app.test_client() as client:
         for rule in app.url_map.iter_rules():
             if "GET" in rule.methods and len(rule.arguments) == 0:
                 if rule.rule.startswith(('/static', '/health')):
                     continue
-                
+
                 try:
                     response = client.get(rule.rule, follow_redirects=True)
                     results[rule.rule] = response.status_code
                 except Exception as e:
                     results[rule.rule] = f"CRASH: {str(e)}"
-                    
+
     return results
+
 
 @main_bp.route("/health/full")
 def full_health_check():
-    """
-    Point de terminaison de diagnostic complet.
-    """
     route_status = check_all_routes(current_app)
-    
-  
-    faild = {k: v for k, v in route_status.items() if v != 200}
-    
+
+    failed = {k: v for k, v in route_status.items() if v != 200}
+
     status_code = 200
     report = {
         "status": "HEALTHY",
@@ -460,11 +449,10 @@ def full_health_check():
         "details": route_status
     }
 
-    if anomalies:
+    if failed:
         report["status"] = "UNHEALTHY"
-        report["anomalies_detected"] = anomalies
+        report["anomalies_detected"] = failed
         report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
-        status_code = 503 
+        status_code = 503
 
     return report, status_code
-
