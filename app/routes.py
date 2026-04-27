@@ -419,9 +419,12 @@ def logs_demo():
     return {"status": "ok"}, 200
 
 
+
+
 # =========================
 # HEALTH CHECK (Feature 1)
 # =========================
+
 
 def check_all_routes(app):
     """
@@ -440,6 +443,7 @@ def check_all_routes(app):
                     results[rule.rule] = f"CRASH: {str(e)}"
     return results
 
+
 @main_bp.route("/health")
 def full_health_check():
     """
@@ -457,6 +461,6 @@ def full_health_check():
     if failed:
         report["status"] = "UNHEALTHY"
         report["anomalies_detected"] = failed
-        report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
-        status_code = 503 
+        report["message"] = "Certaines routes ne répondent pas avec un statut 200."
+        status_code = 503
     return report, status_code
