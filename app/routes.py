@@ -433,13 +433,11 @@ def check_all_routes(app):
             if "GET" in rule.methods and len(rule.arguments) == 0:
                 if rule.rule.startswith(('/static', '/health')):
                     continue
-                
                 try:
                     response = client.get(rule.rule, follow_redirects=True)
                     results[rule.rule] = response.status_code
                 except Exception as e:
                     results[rule.rule] = f"CRASH: {str(e)}"
-                    
     return results
 
 @main_bp.route("/health")
@@ -462,4 +460,3 @@ def full_health_check():
         report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
         status_code = 503 
     return report, status_code
-
