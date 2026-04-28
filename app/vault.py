@@ -2,9 +2,10 @@ import hvac
 import os
 import logging
 
+
 def get_vault_client():
-    client= hvac.Client(
-        url=os.environ.get('VAULT_ADDR','http://openbao:8200'),
+    client = hvac.Client(
+        url=os.environ.get('VAULT_ADDR', 'http://openbao:8200'),
         token=os.environ.get('VAULT_TOKEN')
     )
     if not client.is_authenticated():
@@ -12,16 +13,17 @@ def get_vault_client():
         return None
     return client
 
+
 def get_secret(path, key, mount_point='secret'):
     """
     Récupère un secret spécifique.
     Exemple : get_secret('database', 'password')
     """
-    client= get_vault_client()
+    client = get_vault_client()
     if not client:
         return None
     try:
-        read_ressourse= client.secrets.kv.v2.read_secret_version(
+        read_ressourse = client.secrets.kv.v2.read_secret_version(
             path=path,
             mount_point=mount_point
         )

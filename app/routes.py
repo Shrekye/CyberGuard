@@ -168,7 +168,6 @@ def login():
 def google_login():
     google.client_id = get_secret("cyberguard", "GOOGLE_CLIENT_ID")
     google.client_secret = get_secret("cyberguard", "GOOGLE_CLIENT_SECRET")
-    
     redirect_uri = url_for('main.google_authorize', _external=True, _scheme="https")  # nosemgrep
     return google.authorize_redirect(redirect_uri)
 
