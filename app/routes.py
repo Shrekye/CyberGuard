@@ -505,12 +505,12 @@ def full_health_check():
 
     return report, status_code
 
+
 @main_bp.route("/admin/config")
 def show_config():
     # On va chercher le secret EN DIRECT dans le coffre
     db_pass = get_secret('cyberguard', 'db_password')
-    
     if not db_pass:
         return "Erreur : Coffre-fort inaccessible", 500
-        
+
     return f"Le mot de passe actuel (récupéré de Vault) est : {db_pass}"
