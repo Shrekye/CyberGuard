@@ -6,3 +6,4 @@ Werkzeug
 authlib
 requests
 python-dotenv
+hvac
