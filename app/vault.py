@@ -5,7 +5,7 @@ import logging
 
 def get_vault_client():
     client = hvac.Client(
-        url=os.environ.get('VAULT_ADDR', 'http://openbao:8200'),  #nosec
+        url=os.environ.get('VAULT_ADDR', 'http://openbao:8200'),  # nosec
         token=os.environ.get('VAULT_TOKEN')
     )
     if not client.is_authenticated():
