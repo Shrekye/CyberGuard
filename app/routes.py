@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from app.vault_client import get_secret
+from app.vault import get_secret
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from . import db
 from . import google
