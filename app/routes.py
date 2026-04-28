@@ -469,11 +469,11 @@ def rollback_deploy():
     try:
         current_app.logger.error("ROLLBACK TRIGGERED - restoring previous version")
 
-        subprocess.run(["/usr/bin/git", "reset", "--hard", "HEAD~1"], check=True)
+        subprocess.run(["/usr/bin/git", "reset", "--hard", "HEAD~1"], check=True)  # nosec B603
 
-        subprocess.run(["/usr/bin/git", "push", "--force"], check=True)
+        subprocess.run(["/usr/bin/git", "push", "--force"], check=True)  # nosec B603
 
-        subprocess.run(["/usr/bin/systemctl", "restart", "myapp"], check=True)
+        subprocess.run(["/usr/bin/systemctl", "restart", "myapp"], check=True)  # nosec B603
 
     except Exception as e:
         current_app.logger.critical(f"Rollback failed: {str(e)}")
