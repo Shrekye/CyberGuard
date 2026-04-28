@@ -518,3 +518,18 @@ jobs:
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL_main }}
         run: curl -X POST "$deploy_url"
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Launch CyberGuard with Secrets
+        env:
+          # On lie le nom du secret GitHub au nom attendu par le YAML
+          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        run: docker-compose up -d

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from app.vault_client import get_secret
 from .models import User, RedTopic, BlueTopic, PurpleTopic, Post
 from . import db
 from . import google
@@ -165,6 +166,9 @@ def login():
 
 @main_bp.route('/login/google')
 def google_login():
+    google.client_id = get_secret("cyberguard", "GOOGLE_CLIENT_ID")
+    google.client_secret = get_secret("cyberguard", "GOOGLE_CLIENT_SECRET")
+    
     redirect_uri = url_for('main.google_authorize', _external=True, _scheme="https")  # nosemgrep
     return google.authorize_redirect(redirect_uri)
 
@@ -501,3 +505,13 @@ def full_health_check():
         rollback_deploy()
 
     return report, status_code
+
+@main_bp.route("/admin/config")
+def show_config():
+    # On va chercher le secret EN DIRECT dans le coffre
+    db_pass = get_secret('cyberguard', 'db_password')
+    
+    if not db_pass:
+        return "Erreur : Coffre-fort inaccessible", 500
+        
+    return f"Le mot de passe actuel (récupéré de Vault) est : {db_pass}"
