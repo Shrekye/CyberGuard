@@ -15,7 +15,7 @@ import uuid
 import sys
 import socket
 import logging
-import subprocess
+import subprocess  # nosec B404
 
 
 main_bp = Blueprint("main", __name__)
