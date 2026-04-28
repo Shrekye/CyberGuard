@@ -535,4 +535,4 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: docker-compose up -d
+        run: docker compose up -d
