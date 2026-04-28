@@ -109,10 +109,7 @@ jobs:
 
       - name: Run Bandit scan
         run: |
-          bandit -r . \
-            --skip B104 \
-            --format json \
-            --output bandit-report.json \
+          bandit -r . --skip B104 --format json --output bandit-report.json
         # --skip : ignore les tests spécifiés
         # B104 : hardcoded_bind_all_interfaces (normal pour Docker)
         # B105-107 : hardcoded_password (placeholder dev)
