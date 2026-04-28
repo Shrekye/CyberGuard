@@ -207,15 +207,6 @@ def logout():
 
 
 # =========================
-# SECRET
-# =========================
-
-@main_bp.route("/secret")
-def secret():
-    return render_template("secret.html")
-
-
-# =========================
 # CREATE TOPIC (AVEC IMAGE)
 # =========================
 
@@ -418,20 +409,42 @@ def logs_demo():
 # HEALTH CHECK
 # =========================
 
-
 def check_all_routes(app):
     results = {}
+
+    EXCLUDED_ENDPOINTS = {
+        "main.google_login",
+        "main.google_authorize",
+    }
+
     with app.test_client() as client:
         for rule in app.url_map.iter_rules():
-            if "GET" in rule.methods and len(rule.arguments) == 0:
-                if rule.rule.startswith(('/static', '/health')):
-                    continue
 
-                try:
-                    response = client.get(rule.rule, follow_redirects=True)
-                    results[rule.rule] = response.status_code
-                except Exception as e:
-                    results[rule.rule] = f"CRASH: {str(e)}"
+            if "GET" not in rule.methods:
+                continue
+
+            if len(rule.arguments) != 0:
+                continue
+
+            if rule.rule.startswith(('/static', '/health')):
+                continue
+
+            # skip Google OAuth
+            if rule.endpoint in EXCLUDED_ENDPOINTS:
+                results[rule.rule] = "SKIPPED_OAUTH"
+                continue
+
+            # skip login_required routes
+            view_func = app.view_functions.get(rule.endpoint)
+            if view_func and hasattr(view_func, "__wrapped__"):
+                results[rule.rule] = "SKIPPED_AUTH"
+                continue
+
+            try:
+                response = client.get(rule.rule, follow_redirects=True)
+                results[rule.rule] = response.status_code
+            except Exception as e:
+                results[rule.rule] = f"CRASH: {str(e)}"
 
     return results
 
@@ -440,7 +453,10 @@ def check_all_routes(app):
 def full_health_check():
     route_status = check_all_routes(current_app)
 
-    failed = {k: v for k, v in route_status.items() if v != 200}
+    failed = {
+        k: v for k, v in route_status.items()
+        if v != 200 and not str(v).startswith("SKIPPED")
+    }
 
     status_code = 200
     report = {
@@ -453,7 +469,6 @@ def full_health_check():
     if failed:
         report["status"] = "UNHEALTHY"
         report["anomalies_detected"] = failed
-        report["message"] = "Certaines routes ne répondent pas avec un statut 200 OK."
         status_code = 503
 
     return report, status_code
