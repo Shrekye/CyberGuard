@@ -14,6 +14,7 @@ import uuid
 import sys
 import socket
 import logging
+import subprocess
 
 
 main_bp = Blueprint("main", __name__)
@@ -204,6 +205,15 @@ def google_authorize():
 def logout():
     logout_user()
     return redirect(url_for("main.index"))
+
+
+# =========================
+# SECRET
+# =========================
+
+@main_bp.route("/secret")
+def secret():
+    return render_template("secret.html")
 
 
 # =========================
@@ -429,12 +439,10 @@ def check_all_routes(app):
             if rule.rule.startswith(('/static', '/health')):
                 continue
 
-            # skip Google OAuth
             if rule.endpoint in EXCLUDED_ENDPOINTS:
                 results[rule.rule] = "SKIPPED_OAUTH"
                 continue
 
-            # skip login_required routes
             view_func = app.view_functions.get(rule.endpoint)
             if view_func and hasattr(view_func, "__wrapped__"):
                 results[rule.rule] = "SKIPPED_AUTH"
@@ -447,6 +455,25 @@ def check_all_routes(app):
                 results[rule.rule] = f"CRASH: {str(e)}"
 
     return results
+
+
+def rollback_deploy():
+    """
+    Rollback simple basé sur git.
+    Reviens au commit précédent et redémarre l'app.
+    """
+
+    try:
+        current_app.logger.error("ROLLBACK TRIGGERED - restoring previous version")
+
+        subprocess.run(["git", "reset", "--hard", "HEAD~1"], check=True)
+
+        subprocess.run(["git", "push", "--force"], check=True)
+
+        subprocess.run(["systemctl", "restart", "myapp"], check=True)
+
+    except Exception as e:
+        current_app.logger.critical(f"Rollback failed: {str(e)}")
 
 
 @main_bp.route("/health/full")
@@ -470,5 +497,7 @@ def full_health_check():
         report["status"] = "UNHEALTHY"
         report["anomalies_detected"] = failed
         status_code = 503
+
+        rollback_deploy()
 
     return report, status_code
